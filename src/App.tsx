@@ -3,8 +3,8 @@ import CoreForm from './features/CoreForm/CoreForm';
 
 function App() {
   return (
-    <div className='container mx-auto px-4'>
-      <h1 className='py-2 text-3xl font-bold'>Task Planning Tool</h1>
+    <div className='container mx-auto px-4 py-8'>
+      <h1 className='py-4 text-3xl font-bold'>Task Planning Tool</h1>
       <CoreForm />
     </div>
   );

@@ -102,6 +102,7 @@ const BIQWithPercentInputComponent: React.FC<Props> = ({
                 </label>
                 <input
                   type='number'
+                  step='0.01'
                   id={`employees.${nestIndex}.BIQsWithPercent.${index}.percent`}
                   className='mt-1 block h-10 w-full appearance-none rounded-md pl-4 text-sm leading-6 text-slate-900 placeholder-slate-400 shadow-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500'
                   {...register(
@@ -133,6 +134,7 @@ const BIQWithPercentInputComponent: React.FC<Props> = ({
                 </label>
                 <input
                   type='number'
+                  step='0.01'
                   id={`employees.${nestIndex}.BIQsWithPercent.${index}.hours`}
                   className='mt-1 block h-10 w-full appearance-none rounded-md pl-4 text-sm leading-6 text-slate-900 placeholder-slate-400 shadow-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500'
                   {...register(

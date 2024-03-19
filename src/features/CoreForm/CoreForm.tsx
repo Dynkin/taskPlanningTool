@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm, SubmitHandler, useFieldArray } from 'react-hook-form';
 import { BIQWithPercentInput } from './BIQWithPercentInput/BIQWithPercentInput';
+import { JSONPreview } from './JSONPreview/JSONPreview';
+import 'highlight.js/styles/github.css';
 
 type BIQWithPercent = {
   BIQ: string;
@@ -36,13 +38,28 @@ const CoreForm = () => {
     control,
   });
 
-  const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data);
+  const [formResult, setFormResult] = useState<string>('{}');
+
+  const onSubmit: SubmitHandler<Inputs> = (data) => {
+    const result = {
+      tasks: data.employees
+        .map((employee) => {
+          return employee.BIQsWithPercent.map((BIQWithPercent) => {
+            return {
+              project: data.projectName,
+              summary: `${employee.surname} - ${data.monthName} - ${BIQWithPercent.BIQ}`,
+              BIQ: BIQWithPercent.BIQ,
+              hours: BIQWithPercent.hours,
+            };
+          });
+        })
+        .flat(),
+    };
+    setFormResult(JSON.stringify(result, null, 2));
+  };
 
   return (
     <div>
-      <h1 className='my-4 block text-2xl font-bold'>
-        Форма создания конфигурации
-      </h1>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className='w-[400px]'>
           <label
@@ -171,6 +188,7 @@ const CoreForm = () => {
                       </label>
                       <input
                         type='number'
+                        step='0.01'
                         id={`employees.${employeeFieldIndex}.psu`}
                         className='mt-1 block h-10 w-full appearance-none rounded-md pl-4 text-sm leading-6 text-slate-900 placeholder-slate-400 shadow-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500'
                         placeholder='% ПШЕ'
@@ -228,6 +246,8 @@ const CoreForm = () => {
           Создать конфигурацию
         </button>
       </form>
+
+      <JSONPreview json={formResult} />
     </div>
   );
 };
