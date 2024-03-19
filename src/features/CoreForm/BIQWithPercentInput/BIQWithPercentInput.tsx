@@ -1,24 +1,68 @@
 import React, { memo } from 'react';
-import { useFieldArray } from 'react-hook-form';
+import { useFieldArray, useWatch } from 'react-hook-form';
+import classNames from 'classnames';
 
-import type { UseFormRegister, Control } from 'react-hook-form';
+import type {
+  UseFormRegister,
+  Control,
+  UseFormSetValue,
+} from 'react-hook-form';
 import type { Inputs } from '../CoreForm';
 
 type Props = {
   nestIndex: number;
   control: Control<Inputs, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
   register: UseFormRegister<Inputs>;
+  setValue: UseFormSetValue<Inputs>;
 };
 
 const BIQWithPercentInputComponent: React.FC<Props> = ({
   nestIndex,
   control,
   register,
+  setValue,
 }) => {
   const { fields, remove, append } = useFieldArray({
     control,
     name: `employees.${nestIndex}.BIQsWithPercent`,
   });
+
+  const watchedBIQs = useWatch({
+    control,
+    name: `employees.${nestIndex}.BIQsWithPercent`,
+  });
+
+  const watchedEmployeePsu = useWatch({
+    control,
+    name: `employees.${nestIndex}.psu`,
+  });
+
+  const watchedMonthWorkHours = useWatch({
+    control,
+    name: 'monthWorkHours',
+  });
+
+  const totalBIQPercents = watchedBIQs.reduce(
+    (acc, BIQ) => acc + BIQ.percent,
+    0
+  );
+  const totalBIQHours = watchedBIQs.reduce((acc, BIQ) => acc + BIQ.hours, 0);
+  const totalBIQCount = watchedBIQs.length;
+
+  const isSuccess =
+    totalBIQPercents === 100 &&
+    totalBIQHours === (watchedMonthWorkHours * watchedEmployeePsu) / 100;
+
+  const totalItemClassName = classNames(
+    {
+      'bg-red-500': !isSuccess,
+      'bg-green-500': isSuccess,
+    },
+    'px-6',
+    'py-4',
+    'rounded-md',
+    'text-white'
+  );
 
   return (
     <div className='mt-4'>
@@ -65,6 +109,16 @@ const BIQWithPercentInputComponent: React.FC<Props> = ({
                     {
                       required: true,
                       valueAsNumber: true,
+                      onBlur: (e) => {
+                        const value = e.target.value;
+                        setValue(
+                          `employees.${nestIndex}.BIQsWithPercent.${index}.hours`,
+                          ((watchedMonthWorkHours / 100) *
+                            watchedEmployeePsu *
+                            value) /
+                            100
+                        );
+                      },
                     }
                   )}
                 />
@@ -86,6 +140,14 @@ const BIQWithPercentInputComponent: React.FC<Props> = ({
                     {
                       required: true,
                       valueAsNumber: true,
+                      onBlur: (e) => {
+                        const value = e.target.value;
+                        setValue(
+                          `employees.${nestIndex}.BIQsWithPercent.${index}.percent`,
+                          (value * 100) /
+                            ((watchedMonthWorkHours / 100) * watchedEmployeePsu)
+                        );
+                      },
                     }
                   )}
                 />
@@ -105,7 +167,7 @@ const BIQWithPercentInputComponent: React.FC<Props> = ({
 
       <button
         type='button'
-        className='mt-4 block h-10 rounded-md border border-slate-200 px-6 font-semibold text-slate-900 shadow-sm'
+        className='group mt-4 flex items-center rounded-md bg-blue-500 py-2 pl-2 pr-3 text-sm font-medium text-white shadow-sm hover:bg-blue-400'
         onClick={() =>
           append({
             BIQ: '',
@@ -114,8 +176,40 @@ const BIQWithPercentInputComponent: React.FC<Props> = ({
           })
         }
       >
+        <svg
+          width='20'
+          height='20'
+          fill='currentColor'
+          className='mr-2'
+          aria-hidden='true'
+        >
+          <path d='M10 5a1 1 0 0 1 1 1v3h3a1 1 0 1 1 0 2h-3v3a1 1 0 1 1-2 0v-3H6a1 1 0 1 1 0-2h3V6a1 1 0 0 1 1-1Z' />
+        </svg>
         Добавить BIQ
       </button>
+
+      <div className='mt-4 flex gap-6 border-t border-gray-200 py-4'>
+        <div className={totalItemClassName}>
+          <div className='text-lg'>Общее количество часов</div>
+          <div className='pt-2 text-2xl font-extrabold'>{totalBIQHours}</div>
+        </div>
+        <div className={totalItemClassName}>
+          <div className='text-lg'>Общий процент занятости</div>
+          <div className='py-2 text-2xl font-extrabold'>
+            {totalBIQPercents}%
+          </div>
+        </div>
+        <div className='rouded-md rounded-md bg-gray-200 px-6 py-4'>
+          <div className='text-lg'>Общее количество БИКов</div>
+          <div className='py-2 text-2xl font-extrabold'>{totalBIQCount}</div>
+        </div>
+        <div className='rouded-md rounded-md bg-gray-200 px-6 py-4'>
+          <div className='text-lg'>Загрузка ПШЕ</div>
+          <div className='py-2 text-2xl font-extrabold'>
+            {watchedEmployeePsu}%
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

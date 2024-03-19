@@ -16,6 +16,7 @@ type Employee = {
 };
 
 export type Inputs = {
+  projectName: string;
   monthName: string;
   monthWorkHours: number;
   employees: Employee[];
@@ -26,7 +27,7 @@ const CoreForm = () => {
     register,
     control,
     handleSubmit,
-    watch,
+    setValue,
     formState: { errors },
   } = useForm<Inputs>();
 
@@ -37,9 +38,6 @@ const CoreForm = () => {
 
   const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data);
 
-  console.log(watch('monthName')); // watch input value by passing the name of it
-  console.log(watch('monthWorkHours')); // watch input value by passing the name of it
-
   return (
     <div>
       <h1 className='my-4 block text-2xl font-bold'>
@@ -47,6 +45,24 @@ const CoreForm = () => {
       </h1>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className='w-[400px]'>
+          <label
+            htmlFor='projectName'
+            className='text-md mt-4 block font-medium text-slate-700'
+          >
+            Название проекта
+          </label>
+          <select
+            id='projectName'
+            className='mt-1 block w-full appearance-none rounded-md py-2 pl-4 text-sm leading-6 text-slate-900 placeholder-slate-400 shadow-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500'
+            {...register('projectName')}
+          >
+            <option value='CORPDEV'>CORPDEV</option>
+            <option value='JIRAECM'>JIRAECM</option>
+            <option value='QA'>QA</option>
+          </select>
+        </div>
+
+        <div className='mt-4 w-[400px]'>
           <label
             htmlFor='monthName'
             className='text-md block font-medium text-slate-700'
@@ -105,7 +121,7 @@ const CoreForm = () => {
               return (
                 <div key={employeeField.id} className='mt-4'>
                   <section
-                    className='flex items-end gap-2'
+                    className='flex items-end gap-4'
                     key={employeeField.id}
                   >
                     <div className='w-full'>
@@ -183,6 +199,7 @@ const CoreForm = () => {
                     nestIndex={employeeFieldIndex}
                     control={control}
                     register={register}
+                    setValue={setValue}
                   />
                 </div>
               );
