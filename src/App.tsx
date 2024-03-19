@@ -1,4 +1,3 @@
-import React from 'react';
 import CoreForm from './features/CoreForm/CoreForm';
 
 function App() {

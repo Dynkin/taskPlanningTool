@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useForm, SubmitHandler, useFieldArray } from 'react-hook-form';
 import { BIQWithPercentInput } from './BIQWithPercentInput/BIQWithPercentInput';
 import { JSONPreview } from './JSONPreview/JSONPreview';
