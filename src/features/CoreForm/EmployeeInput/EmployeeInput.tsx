@@ -35,7 +35,7 @@ const EmployeeInputComponent: React.FC<Props> = ({
             htmlFor={`employees.${employeeFieldIndex}.fio`}
             className='text-md block font-medium text-slate-700'
           >
-            ФИО
+            ФИО (полностью)
           </label>
           <input
             type='text'
@@ -52,20 +52,20 @@ const EmployeeInputComponent: React.FC<Props> = ({
 
         <div className='w-full'>
           <label
-            htmlFor={`employees.${employeeFieldIndex}.surname`}
+            htmlFor={`employees.${employeeFieldIndex}.fioShort`}
             className='text-md block font-medium text-slate-700'
           >
-            Фамилия
+            ФИО (сокращенное)
           </label>
           <input
             type='text'
-            id={`employees.${employeeFieldIndex}.surname`}
+            id={`employees.${employeeFieldIndex}.fioShort`}
             className='mt-1 block h-10 w-full appearance-none rounded-md pl-4 text-sm leading-6 text-slate-900 placeholder-slate-400 shadow-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500'
-            {...register(`employees.${employeeFieldIndex}.surname` as const, {
+            {...register(`employees.${employeeFieldIndex}.fioShort` as const, {
               required: true,
             })}
           />
-          {errors.employees?.[employeeFieldIndex]?.surname && (
+          {errors.employees?.[employeeFieldIndex]?.fioShort && (
             <p className='text-red-500'>Обязательное поле</p>
           )}
         </div>

@@ -6,7 +6,7 @@ export type BIQWithPercent = {
 
 export type Employee = {
   fio: string;
-  surname: string;
+  fioShort: string;
   jiraLogin: string;
   psu: number;
   BIQsWithPercent: BIQWithPercent[];
@@ -14,7 +14,7 @@ export type Employee = {
 
 export type Inputs = {
   projectName: string;
-  monthName: string;
+  planningStartDate: string;
   monthWorkHours: number;
   employees: Employee[];
 };

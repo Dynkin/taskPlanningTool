@@ -4,7 +4,7 @@ import { PeopleListItem } from './PeopleListItem/PeopleListItem';
 
 export type PeopleListItem = {
   fio: string;
-  surname: string;
+  fioShort: string;
   jiraLogin: string;
   psu: number;
 };

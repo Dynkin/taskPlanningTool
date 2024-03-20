@@ -30,7 +30,7 @@ const PeopleListItemComponent: React.FC<Props> = ({
           htmlFor={`people.${peopleListItemFieldIndex}.fio`}
           className='text-md block font-medium text-slate-700'
         >
-          ФИО
+          ФИО (полностью)
         </label>
         <input
           type='text'
@@ -47,20 +47,20 @@ const PeopleListItemComponent: React.FC<Props> = ({
 
       <div className='w-full'>
         <label
-          htmlFor={`people.${peopleListItemFieldIndex}.surname`}
+          htmlFor={`people.${peopleListItemFieldIndex}.fioShort`}
           className='text-md block font-medium text-slate-700'
         >
-          Фамилия
+          ФИО (сокращенное)
         </label>
         <input
           type='text'
-          id={`people.${peopleListItemFieldIndex}.surname`}
+          id={`people.${peopleListItemFieldIndex}.fioShort`}
           className='mt-1 block h-10 w-full appearance-none rounded-md pl-4 text-sm leading-6 text-slate-900 placeholder-slate-400 shadow-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500'
-          {...register(`people.${peopleListItemFieldIndex}.surname` as const, {
+          {...register(`people.${peopleListItemFieldIndex}.fioShort` as const, {
             required: true,
           })}
         />
-        {errors.people?.[peopleListItemFieldIndex]?.surname && (
+        {errors.people?.[peopleListItemFieldIndex]?.fioShort && (
           <p className='text-red-500'>Обязательное поле</p>
         )}
       </div>

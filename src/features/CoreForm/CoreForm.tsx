@@ -8,6 +8,8 @@ import {
   setLocalStorage,
   getLocalStorage,
 } from '../../utils/localStorageUtils';
+import { capitalize } from '../../utils/textUtils';
+import { getInputDate } from '../../utils/dateUtils';
 import projectNames from '../../common/contstants/projectNames';
 import 'highlight.js/styles/github.css';
 
@@ -18,14 +20,21 @@ const CoreForm = () => {
   // get form result from localStorage
   const coreFormDataFromLocalStorage = getLocalStorage('coreFormData');
   let defaultCoreFormData: Inputs = {
-    projectName: '',
-    monthName: '',
+    projectName: projectNames[0].value,
+    planningStartDate: getInputDate(new Date()),
     monthWorkHours: 0,
     employees: [],
   };
   if (coreFormDataFromLocalStorage) {
     defaultCoreFormData = JSON.parse(coreFormDataFromLocalStorage);
+    defaultCoreFormData.planningStartDate = getInputDate(
+      defaultCoreFormData.planningStartDate
+        ? new Date(defaultCoreFormData.planningStartDate)
+        : new Date()
+    );
   }
+
+  console.log('defaultCoreFormData', defaultCoreFormData);
 
   // get people list from localStorage
   const peopleListFromLocalStorage = getLocalStorage('peopleList');
@@ -71,12 +80,21 @@ const CoreForm = () => {
       tasks: data.employees
         .map((employee) => {
           return employee.BIQsWithPercent.map((BIQWithPercent) => {
+            const planningStartDt = new Date(data.planningStartDate);
+            const fullYear = planningStartDt.getFullYear();
+            const localeMonth = capitalize(
+              planningStartDt.toLocaleDateString('ru-RU', {
+                month: 'long',
+              })
+            );
+            const jiraDate = getInputDate(planningStartDt);
+
             return {
               project: data.projectName,
               assignee: employee.jiraLogin,
-              summary: `${employee.surname} : ${BIQWithPercent.BIQ} : ${new Date().getFullYear()} ${data.monthName}`,
+              summary: `${employee.fioShort} : ${BIQWithPercent.BIQ} : ${fullYear} ${localeMonth}`,
               priority: 'Lowest',
-              planningStartDt: '2024-03-01',
+              planningStartDt: jiraDate,
               plannedHours: BIQWithPercent.hours,
               BIQ: BIQWithPercent.BIQ,
             };
@@ -115,29 +133,27 @@ const CoreForm = () => {
 
         <div className='mt-4 w-[400px]'>
           <label
-            htmlFor='monthName'
+            htmlFor='planningStartDate'
             className='text-md block font-medium text-slate-700'
           >
-            Название месяца
+            Плановая дата начала
           </label>
-          <select
-            id='monthName'
-            className='mt-1 block w-full appearance-none rounded-md py-2 pl-4 text-sm leading-6 text-slate-900 placeholder-slate-400 shadow-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500'
-            {...register('monthName')}
-          >
-            <option value='Январь'>Январь</option>
-            <option value='Февраль'>Февраль</option>
-            <option value='Март'>Март</option>
-            <option value='Апрель'>Апрель</option>
-            <option value='Май'>Май</option>
-            <option value='Июнь'>Июнь</option>
-            <option value='Июль'>Июль</option>
-            <option value='Август'>Август</option>
-            <option value='Сентябрь'>Сентябрь</option>
-            <option value='Октябрь'>Октябрь</option>
-            <option value='Ноябрь'>Ноябрь</option>
-            <option value='Декабрь'>Декабрь</option>
-          </select>
+          <input
+            type='date'
+            id='planningStartDate'
+            className='w-full rounded-md border border-gray-300 p-2'
+            {...register('planningStartDate', {
+              required: true,
+            })}
+          />
+          <div className='mt-1 block text-red-500'>
+            {errors.planningStartDate && (
+              <span>
+                {errors.planningStartDate.message ||
+                  'Пожалуйста, выберите плановую дату начала'}
+              </span>
+            )}
+          </div>
         </div>
 
         <div className='mt-4 w-[400px]'>
@@ -188,7 +204,7 @@ const CoreForm = () => {
           onClick={() =>
             employeesFieldArray.append({
               fio: '',
-              surname: '',
+              fioShort: '',
               jiraLogin: '',
               psu: 100,
               BIQsWithPercent: [],
