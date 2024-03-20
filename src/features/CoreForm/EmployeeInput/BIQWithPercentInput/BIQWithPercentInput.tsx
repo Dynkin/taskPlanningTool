@@ -7,7 +7,7 @@ import type {
   Control,
   UseFormSetValue,
 } from 'react-hook-form';
-import type { Inputs } from '../CoreForm';
+import type { Inputs } from '../../CoreForm.types';
 
 type Props = {
   nestIndex: number;

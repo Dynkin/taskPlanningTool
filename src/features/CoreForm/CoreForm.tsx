@@ -1,53 +1,79 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm, SubmitHandler, useFieldArray } from 'react-hook-form';
-import { BIQWithPercentInput } from './BIQWithPercentInput/BIQWithPercentInput';
+import { EmployeeInput } from './EmployeeInput/EmployeeInput';
 import { JSONPreview } from './JSONPreview/JSONPreview';
+import { PeopleList } from './PeopleList/PeopleList';
+import { SelectField } from '../../common/components/SelectField/SelectField';
+import {
+  setLocalStorage,
+  getLocalStorage,
+} from '../../utils/localStorageUtils';
+import projectNames from '../../common/contstants/projectNames';
 import 'highlight.js/styles/github.css';
 
-type BIQWithPercent = {
-  BIQ: string;
-  percent: number;
-  hours: number;
-};
-
-type Employee = {
-  fio: string;
-  surname: string;
-  psu: number;
-  BIQsWithPercent: BIQWithPercent[];
-};
-
-export type Inputs = {
-  projectName: string;
-  monthName: string;
-  monthWorkHours: number;
-  employees: Employee[];
-};
+import type { Inputs } from './CoreForm.types';
+import type { PeopleListItem } from './PeopleList/PeopleList';
 
 const CoreForm = () => {
+  // get form result from localStorage
+  const coreFormDataFromLocalStorage = getLocalStorage('coreFormData');
+  let defaultCoreFormData: Inputs = {
+    projectName: '',
+    monthName: '',
+    monthWorkHours: 0,
+    employees: [],
+  };
+  if (coreFormDataFromLocalStorage) {
+    defaultCoreFormData = JSON.parse(coreFormDataFromLocalStorage);
+  }
+
+  // get people list from localStorage
+  const peopleListFromLocalStorage = getLocalStorage('peopleList');
+  let defaultPeopleList: PeopleListItem[] = [];
+  if (peopleListFromLocalStorage) {
+    defaultPeopleList = JSON.parse(peopleListFromLocalStorage);
+  }
+
+  const [tasksJsonConfig, setTasksJsonConfig] = useState<string>('{}');
+  const [peopleList, setPeopleList] =
+    useState<PeopleListItem[]>(defaultPeopleList);
+  const [showPeopleList, setShowPeopleList] = useState<boolean>(false);
+
   const {
     register,
     control,
     handleSubmit,
     setValue,
     formState: { errors },
-  } = useForm<Inputs>();
+  } = useForm<Inputs>({
+    defaultValues: defaultCoreFormData,
+  });
 
   const employeesFieldArray = useFieldArray({
     name: 'employees',
     control,
   });
 
-  const [formResult, setFormResult] = useState<string>('{}');
+  // sync peopleList with localStorage
+  useEffect(() => {
+    setLocalStorage('peopleList', JSON.stringify(peopleList));
+  }, [peopleList]);
+
+  const handleShowPeopleList = () => {
+    setShowPeopleList(!showPeopleList);
+  };
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    const result = {
+    // write form result to localStorage
+    setLocalStorage('coreFormData', JSON.stringify(data));
+
+    const tasksConfig = {
       tasks: data.employees
         .map((employee) => {
           return employee.BIQsWithPercent.map((BIQWithPercent) => {
             return {
               project: data.projectName,
-              assignee: employee.surname,
+              assignee: employee.jiraLogin,
               summary: `${employee.surname} : ${BIQWithPercent.BIQ} : ${new Date().getFullYear()} ${data.monthName}`,
               priority: 'Lowest',
               planningStartDt: '2024-03-01',
@@ -58,28 +84,33 @@ const CoreForm = () => {
         })
         .flat(),
     };
-    setFormResult(JSON.stringify(result, null, 2));
+    setTasksJsonConfig(JSON.stringify(tasksConfig, null, 2));
   };
 
   return (
     <div>
+      {showPeopleList && (
+        <PeopleList peopleList={peopleList} setPeopleList={setPeopleList} />
+      )}
+      <button
+        type='button'
+        className='mt-8 h-10 rounded-md border border-slate-200 px-6 font-semibold text-slate-900'
+        onClick={handleShowPeopleList}
+      >
+        {showPeopleList
+          ? 'Скрыть список сотрудников'
+          : 'Показать список сотрудников'}
+      </button>
+
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className='w-[400px]'>
-          <label
-            htmlFor='projectName'
-            className='text-md mt-4 block font-medium text-slate-700'
-          >
-            Название проекта
-          </label>
-          <select
+          <SelectField
+            label='Названиие проекта'
+            options={projectNames}
             id='projectName'
-            className='mt-1 block w-full appearance-none rounded-md py-2 pl-4 text-sm leading-6 text-slate-900 placeholder-slate-400 shadow-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500'
+            error={errors.projectName}
             {...register('projectName')}
-          >
-            <option value='CORPDEV'>CORPDEV</option>
-            <option value='JIRAECM'>JIRAECM</option>
-            <option value='QA'>QA</option>
-          </select>
+          />
         </div>
 
         <div className='mt-4 w-[400px]'>
@@ -137,96 +168,20 @@ const CoreForm = () => {
 
         <div className='mt-10'>
           {employeesFieldArray.fields.map(
-            (employeeField, employeeFieldIndex) => {
-              return (
-                <div key={employeeField.id} className='mt-4'>
-                  <section
-                    className='flex items-end gap-4'
-                    key={employeeField.id}
-                  >
-                    <div className='w-full'>
-                      <label
-                        htmlFor={`employees.${employeeFieldIndex}.fio`}
-                        className='text-md block font-medium text-slate-700'
-                      >
-                        ФИО
-                      </label>
-                      <input
-                        type='text'
-                        id={`employees.${employeeFieldIndex}.fio`}
-                        className='mt-1 block h-10 w-full appearance-none rounded-md pl-4 text-sm leading-6 text-slate-900 placeholder-slate-400 shadow-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500'
-                        {...register(
-                          `employees.${employeeFieldIndex}.fio` as const,
-                          {
-                            required: true,
-                          }
-                        )}
-                      />
-                    </div>
-                    <div className='w-full'>
-                      <label
-                        htmlFor={`employees.${employeeFieldIndex}.surname`}
-                        className='text-md block font-medium text-slate-700'
-                      >
-                        Фамилия
-                      </label>
-                      <input
-                        type='text'
-                        id={`employees.${employeeFieldIndex}.surname`}
-                        className='mt-1 block h-10 w-full appearance-none rounded-md pl-4 text-sm leading-6 text-slate-900 placeholder-slate-400 shadow-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500'
-                        {...register(
-                          `employees.${employeeFieldIndex}.surname` as const,
-                          {
-                            required: true,
-                          }
-                        )}
-                      />
-                    </div>
-                    <div className='w-full'>
-                      <label
-                        htmlFor={`employees.${employeeFieldIndex}.psu`}
-                        className='text-md block font-medium text-slate-700'
-                      >
-                        Процент ПШЕ
-                      </label>
-                      <input
-                        type='number'
-                        step='0.01'
-                        id={`employees.${employeeFieldIndex}.psu`}
-                        className='mt-1 block h-10 w-full appearance-none rounded-md pl-4 text-sm leading-6 text-slate-900 placeholder-slate-400 shadow-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500'
-                        placeholder='% ПШЕ'
-                        {...register(
-                          `employees.${employeeFieldIndex}.psu` as const,
-                          {
-                            required: true,
-                            valueAsNumber: true,
-                          }
-                        )}
-                      />
-                    </div>
-
-                    <button
-                      type='button'
-                      className='h-10 rounded-md border border-red-500 px-4 text-sm leading-6 text-red-500 shadow-sm'
-                      onClick={() =>
-                        employeesFieldArray.remove(employeeFieldIndex)
-                      }
-                    >
-                      Удалить
-                    </button>
-                  </section>
-
-                  <BIQWithPercentInput
-                    nestIndex={employeeFieldIndex}
-                    control={control}
-                    register={register}
-                    setValue={setValue}
-                  />
-                </div>
-              );
-            }
+            (employeeField, employeeFieldIndex) => (
+              <EmployeeInput
+                key={employeeField.id}
+                employeeFieldIndex={employeeFieldIndex}
+                register={register}
+                errors={errors}
+                remove={employeesFieldArray.remove}
+                setValue={setValue}
+                control={control}
+              />
+            )
           )}
         </div>
+
         <button
           type='button'
           className='mt-10 block h-10 rounded-md border border-slate-200 px-6 font-semibold text-slate-900 shadow-sm'
@@ -234,12 +189,13 @@ const CoreForm = () => {
             employeesFieldArray.append({
               fio: '',
               surname: '',
+              jiraLogin: '',
               psu: 100,
               BIQsWithPercent: [],
             })
           }
         >
-          Добавить сотрудника
+          Добавить план сотрудника
         </button>
 
         <button
@@ -250,7 +206,7 @@ const CoreForm = () => {
         </button>
       </form>
 
-      <JSONPreview json={formResult} />
+      <JSONPreview json={tasksJsonConfig} />
     </div>
   );
 };
