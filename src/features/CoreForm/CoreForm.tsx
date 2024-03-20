@@ -47,9 +47,12 @@ const CoreForm = () => {
           return employee.BIQsWithPercent.map((BIQWithPercent) => {
             return {
               project: data.projectName,
-              summary: `${employee.surname} - ${data.monthName} - ${BIQWithPercent.BIQ}`,
+              assignee: employee.surname,
+              summary: `${employee.surname} : ${BIQWithPercent.BIQ} : ${new Date().getFullYear()} ${data.monthName}`,
+              priority: 'Lowest',
+              planningStartDt: '2024-03-01',
+              plannedHours: BIQWithPercent.hours,
               BIQ: BIQWithPercent.BIQ,
-              hours: BIQWithPercent.hours,
             };
           });
         })
