@@ -28,7 +28,7 @@ const SelectFieldComponent = forwardRef<Ref, Props>(
         >
           {label}
         </label>
-        <select className={computedClassName} id={id} ref={ref} {...props}>
+        <select {...props} className={computedClassName} id={id} ref={ref}>
           {options.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
