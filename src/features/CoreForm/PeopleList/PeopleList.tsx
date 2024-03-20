@@ -66,7 +66,7 @@ const PeopleListComponent: React.FC<Props> = ({
             onClick={() =>
               peopleFieldArray.append({
                 fio: '',
-                surname: '',
+                fioShort: '',
                 jiraLogin: '',
                 psu: 100,
               })
