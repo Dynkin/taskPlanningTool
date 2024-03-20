@@ -16,11 +16,13 @@ export type Inputs = {
 type Props = {
   peopleList: PeopleListItem[];
   setPeopleList: React.Dispatch<React.SetStateAction<PeopleListItem[]>>;
+  className?: string;
 };
 
 const PeopleListComponent: React.FC<Props> = ({
   peopleList,
   setPeopleList,
+  className,
 }) => {
   const {
     register,
@@ -40,15 +42,14 @@ const PeopleListComponent: React.FC<Props> = ({
   });
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    console.log('peopleListFormResult', data);
     setPeopleList(data.people);
   };
 
   return (
-    <div>
+    <div className={className}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div>
-          <div className='flex flex-col gap-2'>
+          <div className='flex flex-col gap-4'>
             {peopleFieldArray.fields.map((peopleListItemField, index) => (
               <PeopleListItem
                 key={peopleListItemField.id}
@@ -87,7 +88,7 @@ const PeopleListComponent: React.FC<Props> = ({
 
         <button
           type='submit'
-          className='mt-8 h-10 rounded-md border border-slate-200 px-6 font-semibold text-slate-900'
+          className='mt-8 rounded-md bg-green-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-green-400'
         >
           Сохранить список сотрудников
         </button>

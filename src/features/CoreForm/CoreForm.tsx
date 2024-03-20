@@ -34,8 +34,6 @@ const CoreForm = () => {
     );
   }
 
-  console.log('defaultCoreFormData', defaultCoreFormData);
-
   // get people list from localStorage
   const peopleListFromLocalStorage = getLocalStorage('peopleList');
   let defaultPeopleList: PeopleListItem[] = [];
@@ -107,9 +105,6 @@ const CoreForm = () => {
 
   return (
     <div>
-      {showPeopleList && (
-        <PeopleList peopleList={peopleList} setPeopleList={setPeopleList} />
-      )}
       <button
         type='button'
         className='mt-8 h-10 rounded-md border border-slate-200 px-6 font-semibold text-slate-900'
@@ -119,6 +114,14 @@ const CoreForm = () => {
           ? 'Скрыть список сотрудников'
           : 'Показать список сотрудников'}
       </button>
+
+      {showPeopleList && (
+        <PeopleList
+          peopleList={peopleList}
+          setPeopleList={setPeopleList}
+          className='mt-4'
+        />
+      )}
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className='w-[400px]'>
@@ -193,6 +196,7 @@ const CoreForm = () => {
                 remove={employeesFieldArray.remove}
                 setValue={setValue}
                 control={control}
+                peopleList={peopleList}
               />
             )
           )}
@@ -216,7 +220,7 @@ const CoreForm = () => {
 
         <button
           type='submit'
-          className='mt-8 h-10 rounded-md border border-slate-200 px-6 font-semibold text-slate-900'
+          className='mt-8 rounded-md bg-green-500 px-4 py-2 font-medium font-semibold text-white shadow-sm hover:bg-green-400'
         >
           Создать конфигурацию
         </button>

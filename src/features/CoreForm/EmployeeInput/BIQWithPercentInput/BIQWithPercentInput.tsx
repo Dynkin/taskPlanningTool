@@ -6,6 +6,7 @@ import type {
   UseFormRegister,
   Control,
   UseFormSetValue,
+  FieldErrors,
 } from 'react-hook-form';
 import type { Inputs } from '../../CoreForm.types';
 
@@ -14,6 +15,7 @@ type Props = {
   control: Control<Inputs, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
   register: UseFormRegister<Inputs>;
   setValue: UseFormSetValue<Inputs>;
+  errors: FieldErrors<Inputs>;
 };
 
 const BIQWithPercentInputComponent: React.FC<Props> = ({
@@ -190,28 +192,30 @@ const BIQWithPercentInputComponent: React.FC<Props> = ({
         Добавить BIQ
       </button>
 
-      <div className='mt-4 flex gap-6 border-t border-gray-200 py-4'>
-        <div className={totalItemClassName}>
-          <div className='text-lg'>Общее количество часов</div>
-          <div className='pt-2 text-2xl font-extrabold'>{totalBIQHours}</div>
-        </div>
-        <div className={totalItemClassName}>
-          <div className='text-lg'>Общий процент занятости</div>
-          <div className='py-2 text-2xl font-extrabold'>
-            {totalBIQPercents}%
+      {totalBIQCount > 0 && (
+        <div className='mt-4 flex gap-6 border-t border-gray-200 pt-4'>
+          <div className={totalItemClassName}>
+            <div className='text-lg'>Общее количество часов</div>
+            <div className='pt-2 text-2xl font-extrabold'>{totalBIQHours}</div>
+          </div>
+          <div className={totalItemClassName}>
+            <div className='text-lg'>Общий процент занятости</div>
+            <div className='py-2 text-2xl font-extrabold'>
+              {totalBIQPercents}%
+            </div>
+          </div>
+          <div className='rouded-md rounded-md bg-gray-200 px-6 py-4'>
+            <div className='text-lg'>Общее количество БИКов</div>
+            <div className='py-2 text-2xl font-extrabold'>{totalBIQCount}</div>
+          </div>
+          <div className='rouded-md rounded-md bg-gray-200 px-6 py-4'>
+            <div className='text-lg'>Загрузка ПШЕ</div>
+            <div className='py-2 text-2xl font-extrabold'>
+              {watchedEmployeePsu}%
+            </div>
           </div>
         </div>
-        <div className='rouded-md rounded-md bg-gray-200 px-6 py-4'>
-          <div className='text-lg'>Общее количество БИКов</div>
-          <div className='py-2 text-2xl font-extrabold'>{totalBIQCount}</div>
-        </div>
-        <div className='rouded-md rounded-md bg-gray-200 px-6 py-4'>
-          <div className='text-lg'>Загрузка ПШЕ</div>
-          <div className='py-2 text-2xl font-extrabold'>
-            {watchedEmployeePsu}%
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 };
