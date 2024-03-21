@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import { useFieldArray, useWatch } from 'react-hook-form';
 import classNames from 'classnames';
+import { SelectField } from '../../../../common/components/SelectField/SelectField';
 
 import type {
   UseFormRegister,
@@ -9,8 +10,10 @@ import type {
   FieldErrors,
 } from 'react-hook-form';
 import type { Inputs } from '../../CoreForm.types';
+import type { BIQsListItem } from '../../BIQsList/BIQsList';
 
 type Props = {
+  biqsList: BIQsListItem[];
   nestIndex: number;
   control: Control<Inputs, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
   register: UseFormRegister<Inputs>;
@@ -19,6 +22,7 @@ type Props = {
 };
 
 const BIQWithPercentInputComponent: React.FC<Props> = ({
+  biqsList,
   nestIndex,
   control,
   register,
@@ -66,6 +70,12 @@ const BIQWithPercentInputComponent: React.FC<Props> = ({
     'text-white'
   );
 
+  const biqsOptions = biqsList.map((BIQ) => ({
+    value: BIQ.BIQTaskId,
+    label: `${BIQ.BIQTaskId} ${BIQ.BIQTaskSummary}`,
+  }));
+  biqsOptions.unshift({ value: '', label: 'Не выбрано' });
+
   return (
     <div className='mt-4'>
       <div className='grid grid-cols-4 gap-4'>
@@ -75,25 +85,17 @@ const BIQWithPercentInputComponent: React.FC<Props> = ({
               key={item.id}
               className='rounded-md border border-gray-200 p-4 shadow-sm'
             >
-              <div>
-                <label
-                  htmlFor={`employees.${nestIndex}.BIQsWithPercent.${index}.BIQ`}
-                  className='text-md block font-medium text-slate-700'
-                >
-                  BIQ
-                </label>
-                <input
-                  type='text'
-                  id={`employees.${nestIndex}.BIQsWithPercent.${index}.BIQ`}
-                  className='mt-1 block h-10 w-full appearance-none rounded-md px-4 text-sm leading-6 text-slate-900 placeholder-slate-400 shadow-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500'
-                  {...register(
-                    `employees.${nestIndex}.BIQsWithPercent.${index}.BIQ`,
-                    {
-                      required: true,
-                    }
-                  )}
-                />
-              </div>
+              <SelectField
+                label='BIQ'
+                options={biqsOptions}
+                id={`employees.${nestIndex}.BIQsWithPercent.${index}.BIQ`}
+                {...register(
+                  `employees.${nestIndex}.BIQsWithPercent.${index}.BIQ`,
+                  {
+                    required: true,
+                  }
+                )}
+              />
 
               <div className='mt-4'>
                 <label

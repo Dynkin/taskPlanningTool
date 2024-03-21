@@ -3,6 +3,7 @@ import { useForm, SubmitHandler, useFieldArray } from 'react-hook-form';
 import { EmployeeInput } from './EmployeeInput/EmployeeInput';
 import { JSONPreview } from './JSONPreview/JSONPreview';
 import { PeopleList } from './PeopleList/PeopleList';
+import { BIQsList } from './BIQsList/BIQsList';
 import { SelectField } from '../../common/components/SelectField/SelectField';
 import {
   setLocalStorage,
@@ -15,6 +16,7 @@ import 'highlight.js/styles/github.css';
 
 import type { Inputs } from './CoreForm.types';
 import type { PeopleListItem } from './PeopleList/PeopleList';
+import type { BIQsListItem } from './BIQsList/BIQsList';
 
 const CoreForm = () => {
   // get form result from localStorage
@@ -41,10 +43,19 @@ const CoreForm = () => {
     defaultPeopleList = JSON.parse(peopleListFromLocalStorage);
   }
 
+  // get BIQs list from localStorage
+  const BIQsListFromLocalStorage = getLocalStorage('BIQsList');
+  let defaultBIQsList: BIQsListItem[] = [];
+  if (BIQsListFromLocalStorage) {
+    defaultBIQsList = JSON.parse(BIQsListFromLocalStorage);
+  }
+
   const [tasksJsonConfig, setTasksJsonConfig] = useState<string>('{}');
   const [peopleList, setPeopleList] =
     useState<PeopleListItem[]>(defaultPeopleList);
   const [showPeopleList, setShowPeopleList] = useState<boolean>(false);
+  const [biqsList, setBiqsList] = useState<BIQsListItem[]>(defaultBIQsList);
+  const [showBIQsList, setShowBIQsList] = useState<boolean>(false);
 
   const {
     register,
@@ -66,8 +77,17 @@ const CoreForm = () => {
     setLocalStorage('peopleList', JSON.stringify(peopleList));
   }, [peopleList]);
 
+  // sync BIQsList with localStorage
+  useEffect(() => {
+    setLocalStorage('BIQsList', JSON.stringify(biqsList));
+  }, [biqsList]);
+
   const handleShowPeopleList = () => {
     setShowPeopleList(!showPeopleList);
+  };
+
+  const handleShowBIQsList = () => {
+    setShowBIQsList(!showBIQsList);
   };
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
@@ -107,7 +127,7 @@ const CoreForm = () => {
     <div>
       <button
         type='button'
-        className='mt-8 h-10 rounded-md border border-slate-200 px-6 font-semibold text-slate-900'
+        className='mt-8 block h-10 rounded-md border border-slate-200 px-6 font-semibold text-slate-900'
         onClick={handleShowPeopleList}
       >
         {showPeopleList
@@ -119,6 +139,22 @@ const CoreForm = () => {
         <PeopleList
           peopleList={peopleList}
           setPeopleList={setPeopleList}
+          className='mt-4'
+        />
+      )}
+
+      <button
+        type='button'
+        className='mt-8 block h-10 rounded-md border border-slate-200 px-6 font-semibold text-slate-900'
+        onClick={handleShowBIQsList}
+      >
+        {showBIQsList ? 'Скрыть список БИКов' : 'Показать список БИКов'}
+      </button>
+
+      {showBIQsList && (
+        <BIQsList
+          biqsList={biqsList}
+          setBiqsList={setBiqsList}
           className='mt-4'
         />
       )}
@@ -197,6 +233,7 @@ const CoreForm = () => {
                 setValue={setValue}
                 control={control}
                 peopleList={peopleList}
+                biqsList={biqsList}
               />
             )
           )}
@@ -220,7 +257,7 @@ const CoreForm = () => {
 
         <button
           type='submit'
-          className='mt-8 rounded-md bg-green-500 px-4 py-2 font-medium font-semibold text-white shadow-sm hover:bg-green-400'
+          className='mt-8 rounded-md bg-green-500 px-4 py-2 font-semibold text-white shadow-sm hover:bg-green-400'
         >
           Создать конфигурацию
         </button>

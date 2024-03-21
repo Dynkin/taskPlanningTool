@@ -4,6 +4,7 @@ import { BIQWithPercentInput } from './BIQWithPercentInput/BIQWithPercentInput';
 
 import type { Inputs } from '../CoreForm.types';
 import type { PeopleListItem } from '../PeopleList/PeopleList';
+import type { BIQsListItem } from '../BIQsList/BIQsList';
 import type {
   UseFormRegister,
   UseFieldArrayRemove,
@@ -20,6 +21,7 @@ type Props = {
   remove: UseFieldArrayRemove;
   control: Control<Inputs, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
   peopleList: PeopleListItem[];
+  biqsList: BIQsListItem[];
 };
 
 const EmployeeInputComponent: React.FC<Props> = ({
@@ -30,6 +32,7 @@ const EmployeeInputComponent: React.FC<Props> = ({
   remove,
   control,
   peopleList,
+  biqsList,
 }) => {
   const [employeeIsVisible, setEmployeeIsVisible] = useState<boolean>(false);
   const watchedEmployees = useWatch({
@@ -184,6 +187,7 @@ const EmployeeInputComponent: React.FC<Props> = ({
       </section>
 
       <BIQWithPercentInput
+        biqsList={biqsList}
         nestIndex={employeeFieldIndex}
         control={control}
         register={register}

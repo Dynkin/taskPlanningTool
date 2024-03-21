@@ -28,7 +28,6 @@ const PeopleListComponent: React.FC<Props> = ({
     register,
     control,
     handleSubmit,
-    // setValue,
     formState: { errors },
   } = useForm<Inputs>({
     defaultValues: {
