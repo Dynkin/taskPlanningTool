@@ -239,21 +239,27 @@ const CoreForm = () => {
           )}
         </div>
 
-        <button
-          type='button'
-          className='mt-10 block h-10 rounded-md border border-slate-200 px-6 font-semibold text-slate-900 shadow-sm'
-          onClick={() =>
-            employeesFieldArray.append({
-              fio: '',
-              fioShort: '',
-              jiraLogin: '',
-              psu: 100,
-              BIQsWithPercent: [],
-            })
-          }
-        >
-          Добавить план сотрудника
-        </button>
+        {employeesFieldArray.fields.length < peopleList.length ? (
+          <button
+            type='button'
+            className='mt-10 block h-10 rounded-md border border-slate-200 px-6 font-semibold text-slate-900 shadow-sm'
+            onClick={() =>
+              employeesFieldArray.append({
+                fio: '',
+                fioShort: '',
+                jiraLogin: '',
+                psu: 100,
+                BIQsWithPercent: [],
+              })
+            }
+          >
+            Добавить план сотрудника
+          </button>
+        ) : (
+          <div className='mt-6 text-lg font-semibold text-green-500'>
+            Вы добавили план для всех сотрудников из списка!
+          </div>
+        )}
 
         <button
           type='submit'

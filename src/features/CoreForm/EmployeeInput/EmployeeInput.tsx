@@ -42,7 +42,11 @@ const EmployeeInputComponent: React.FC<Props> = ({
   });
 
   useEffect(() => {
-    if (watchedEmployees[employeeFieldIndex]) {
+    const currentFio = watchedEmployees[employeeFieldIndex]?.fio;
+    const employeeIndex = watchedEmployees.findIndex(
+      (employee) => employee.fio === currentFio
+    );
+    if (employeeIndex >= 0 && currentFio !== '') {
       setEmployeeIsVisible(true);
     }
   }, [watchedEmployees, employeeFieldIndex]);
