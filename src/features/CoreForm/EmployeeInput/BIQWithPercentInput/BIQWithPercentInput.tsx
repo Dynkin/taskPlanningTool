@@ -116,12 +116,14 @@ const BIQWithPercentInputComponent: React.FC<Props> = ({
                       valueAsNumber: true,
                       onBlur: (e) => {
                         const value = e.target.value;
-                        setValue(
-                          `employees.${nestIndex}.BIQsWithPercent.${index}.hours`,
+                        const calculatedHours =
                           ((watchedMonthWorkHours / 100) *
                             watchedEmployeePsu *
                             value) /
-                            100
+                          100;
+                        setValue(
+                          `employees.${nestIndex}.BIQsWithPercent.${index}.hours`,
+                          parseFloat(calculatedHours.toFixed(2))
                         );
                       },
                     }
@@ -148,10 +150,12 @@ const BIQWithPercentInputComponent: React.FC<Props> = ({
                       valueAsNumber: true,
                       onBlur: (e) => {
                         const value = e.target.value;
+                        const calculatedPercent =
+                          (value * 100) /
+                          ((watchedMonthWorkHours / 100) * watchedEmployeePsu);
                         setValue(
                           `employees.${nestIndex}.BIQsWithPercent.${index}.percent`,
-                          (value * 100) /
-                            ((watchedMonthWorkHours / 100) * watchedEmployeePsu)
+                          parseFloat(calculatedPercent.toFixed(2))
                         );
                       },
                     }
