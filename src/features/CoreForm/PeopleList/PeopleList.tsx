@@ -25,7 +25,6 @@ const PeopleListComponent: React.FC<Props> = ({
   className,
 }) => {
   const {
-    register,
     control,
     handleSubmit,
     formState: { errors },
@@ -53,7 +52,7 @@ const PeopleListComponent: React.FC<Props> = ({
               <PeopleListItem
                 key={peopleListItemField.id}
                 peopleListItemFieldIndex={index}
-                register={register}
+                control={control}
                 errors={errors}
                 remove={peopleFieldArray.remove}
               />
