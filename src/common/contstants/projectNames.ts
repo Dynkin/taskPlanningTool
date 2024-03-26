@@ -11,4 +11,8 @@ export default [
     label: 'JIRAECM',
     value: 'JIRAECM',
   },
+  {
+    label: 'BASQA',
+    value: 'BASQA',
+  },
 ];
