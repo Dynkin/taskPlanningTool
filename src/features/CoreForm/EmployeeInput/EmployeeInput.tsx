@@ -1,6 +1,8 @@
 import React, { memo, useState, useEffect } from 'react';
 import { useWatch } from 'react-hook-form';
 import { BIQWithPercentInput } from './BIQWithPercentInput/BIQWithPercentInput';
+import { Select } from 'antd';
+import { defaultSelectFilterOption } from '@/utils/inputUtils';
 
 import type { Inputs } from '../CoreForm.types';
 import type { PeopleListItem } from '../PeopleList/PeopleList';
@@ -60,42 +62,33 @@ const EmployeeInputComponent: React.FC<Props> = ({
     );
   peopleOptions.unshift({ value: '', label: 'Не выбрано' });
 
+  const selectOnChangeHandler = (value: string) => {
+    const foundEmployee = peopleList.find((person) => person.fio === value);
+    setValue(`employees.${employeeFieldIndex}.fio`, foundEmployee?.fio || '');
+    setValue(
+      `employees.${employeeFieldIndex}.fioShort`,
+      foundEmployee?.fioShort || ''
+    );
+    setValue(
+      `employees.${employeeFieldIndex}.jiraLogin`,
+      foundEmployee?.jiraLogin || ''
+    );
+    setValue(`employees.${employeeFieldIndex}.psu`, foundEmployee?.psu || 100);
+    setEmployeeIsVisible(true);
+  };
+
   return (
     <div className='mt-4 rounded-md border border-gray-200 p-4'>
       <section>
         {!employeeIsVisible ? (
-          <select
-            className='rounded-md border border-gray-300 p-2'
+          <Select
+            className='w-80'
             id={`employees.${employeeFieldIndex}.fio`}
-            onChange={(e) => {
-              const foundEmployee = peopleList.find(
-                (person) => person.fio === e.target.value
-              );
-              setValue(
-                `employees.${employeeFieldIndex}.fio`,
-                foundEmployee?.fio || ''
-              );
-              setValue(
-                `employees.${employeeFieldIndex}.fioShort`,
-                foundEmployee?.fioShort || ''
-              );
-              setValue(
-                `employees.${employeeFieldIndex}.jiraLogin`,
-                foundEmployee?.jiraLogin || ''
-              );
-              setValue(
-                `employees.${employeeFieldIndex}.psu`,
-                foundEmployee?.psu || 100
-              );
-              setEmployeeIsVisible(true);
-            }}
-          >
-            {peopleOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+            onChange={selectOnChangeHandler}
+            options={peopleOptions}
+            filterOption={defaultSelectFilterOption}
+            showSearch
+          />
         ) : (
           <div className='flex items-end gap-4'>
             <div className='w-full'>

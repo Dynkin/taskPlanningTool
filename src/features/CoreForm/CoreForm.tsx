@@ -1,5 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useForm, SubmitHandler, useFieldArray } from 'react-hook-form';
+import {
+  useForm,
+  SubmitHandler,
+  useFieldArray,
+  Controller,
+} from 'react-hook-form';
 import { EmployeeInput } from './EmployeeInput/EmployeeInput';
 import { JSONPreview } from './JSONPreview/JSONPreview';
 import { PeopleList } from './PeopleList/PeopleList';
@@ -161,12 +166,24 @@ const CoreForm = () => {
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className='w-[400px]'>
-          <SelectField
-            label='Названиие проекта'
-            options={projectNames}
-            id='projectName'
-            error={errors.projectName}
-            {...register('projectName')}
+          <Controller
+            control={control}
+            name='projectName'
+            rules={{
+              required: 'Не указано название проекта',
+            }}
+            render={({ field: { onChange, onBlur, value } }) => (
+              <SelectField
+                error={errors.projectName}
+                onChange={onChange}
+                onBlur={onBlur}
+                value={value}
+                label='Названиие проекта'
+                options={projectNames}
+                id='projectName'
+                showSearch
+              />
+            )}
           />
         </div>
 

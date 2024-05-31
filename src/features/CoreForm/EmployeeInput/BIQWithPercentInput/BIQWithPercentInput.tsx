@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { useFieldArray, useWatch } from 'react-hook-form';
+import { useFieldArray, useWatch, Controller } from 'react-hook-form';
 import classNames from 'classnames';
 import { SelectField } from '../../../../common/components/SelectField/SelectField';
 
@@ -85,18 +85,24 @@ const BIQWithPercentInputComponent: React.FC<Props> = ({
               key={item.id}
               className='rounded-md border border-gray-200 p-4 shadow-sm'
             >
-              <SelectField
-                label='BIQ'
-                options={biqsOptions}
-                id={`employees.${nestIndex}.BIQsWithPercent.${index}.BIQ`}
-                {...register(
-                  `employees.${nestIndex}.BIQsWithPercent.${index}.BIQ`,
-                  {
-                    required: true,
-                  }
+              <Controller
+                control={control}
+                name={`employees.${nestIndex}.BIQsWithPercent.${index}.BIQ`}
+                rules={{
+                  required: 'Не указан BIQ',
+                }}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <SelectField
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    value={value}
+                    label='BIQ'
+                    options={biqsOptions}
+                    id={`employees.${nestIndex}.BIQsWithPercent.${index}.BIQ`}
+                    showSearch
+                  />
                 )}
               />
-
               <div className='mt-4'>
                 <label
                   htmlFor={`employees.${nestIndex}.BIQsWithPercent.${index}.percent`}
