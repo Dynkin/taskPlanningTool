@@ -205,28 +205,6 @@ const CoreForm = () => {
                 />
               )}
             />
-            {/* <label
-              htmlFor='planningStartDate'
-              className='text-md block font-medium text-slate-700'
-            >
-              Плановая дата начала
-            </label>
-            <input
-              type='date'
-              id='planningStartDate'
-              className='w-full rounded-md border border-gray-300 p-2'
-              {...register('planningStartDate', {
-                required: true,
-              })}
-            />
-            <div className='mt-1 block text-red-500'>
-              {errors.planningStartDate && (
-                <span>
-                  {errors.planningStartDate.message ||
-                    'Пожалуйста, выберите плановую дату начала'}
-                </span>
-              )}
-            </div> */}
           </div>
 
           <div className='grow'>
