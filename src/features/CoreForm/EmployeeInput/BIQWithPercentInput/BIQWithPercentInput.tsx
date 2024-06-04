@@ -1,10 +1,10 @@
 import React, { memo } from 'react';
 import { useFieldArray, useWatch, Controller } from 'react-hook-form';
 import classNames from 'classnames';
-import { SelectField } from '@/common/components/SelectField/SelectField';
-import { InputField } from '@/common/components/InputField/InputField';
 import { Button } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
+import { SelectField } from '@/common/components/SelectField/SelectField';
+import { InputField } from '@/common/components/InputField/InputField';
 
 import type {
   UseFormRegister,

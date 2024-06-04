@@ -1,4 +1,6 @@
 import React, { memo } from 'react';
+import { Button } from 'antd';
+import { DeleteOutlined } from '@ant-design/icons';
 import { InputField } from '@/common/components/InputField/InputField';
 
 import type { Inputs } from '../PeopleList';
@@ -23,12 +25,13 @@ const PeopleListItemComponent: React.FC<Props> = ({
 }) => {
   return (
     <div className='flex items-end gap-4'>
-      <div className='block w-20 text-lg font-bold leading-10 text-slate-700'>
+      <div className='w-5 shrink-0 grow-0 text-lg font-bold leading-8 text-slate-700'>
         {peopleListItemFieldIndex + 1}
       </div>
       <div className='w-full'>
         <InputField
           label='ФИО (полностью)'
+          placeholder='Иванов Иван Иванович'
           control={control}
           name={`people.${peopleListItemFieldIndex}.fio` as const}
           rules={{
@@ -44,6 +47,7 @@ const PeopleListItemComponent: React.FC<Props> = ({
       <div className='w-full'>
         <InputField
           label='ФИО (сокращенное)'
+          placeholder='Иванов И.И.'
           control={control}
           name={`people.${peopleListItemFieldIndex}.fioShort` as const}
           rules={{
@@ -59,6 +63,7 @@ const PeopleListItemComponent: React.FC<Props> = ({
       <div className='w-full'>
         <InputField
           label='Логин Jira'
+          placeholder='Ivanov-II'
           control={control}
           name={`people.${peopleListItemFieldIndex}.jiraLogin` as const}
           rules={{
@@ -97,13 +102,14 @@ const PeopleListItemComponent: React.FC<Props> = ({
         />
       </div>
 
-      <button
-        type='button'
-        className='h-10 rounded-md border border-red-500 px-4 text-sm leading-6 text-red-500 shadow-sm'
+      <Button
+        type='primary'
+        icon={<DeleteOutlined />}
         onClick={() => remove(peopleListItemFieldIndex)}
+        danger
       >
         Удалить
-      </button>
+      </Button>
     </div>
   );
 };

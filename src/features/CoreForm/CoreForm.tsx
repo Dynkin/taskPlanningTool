@@ -5,6 +5,7 @@ import {
   useFieldArray,
   Controller,
 } from 'react-hook-form';
+import { Collapse, Alert } from 'antd';
 import { EmployeeInput } from './EmployeeInput/EmployeeInput';
 import { JSONPreview } from './JSONPreview/JSONPreview';
 import { PeopleList } from './PeopleList/PeopleList';
@@ -59,9 +60,7 @@ const CoreForm = () => {
   const [tasksJsonConfig, setTasksJsonConfig] = useState<string>('{}');
   const [peopleList, setPeopleList] =
     useState<PeopleListItem[]>(defaultPeopleList);
-  const [showPeopleList, setShowPeopleList] = useState<boolean>(false);
   const [biqsList, setBiqsList] = useState<BIQsListItem[]>(defaultBIQsList);
-  const [showBIQsList, setShowBIQsList] = useState<boolean>(false);
 
   const {
     register,
@@ -87,14 +86,6 @@ const CoreForm = () => {
   useEffect(() => {
     setLocalStorage('BIQsList', JSON.stringify(biqsList));
   }, [biqsList]);
-
-  const handleShowPeopleList = () => {
-    setShowPeopleList(!showPeopleList);
-  };
-
-  const handleShowBIQsList = () => {
-    setShowBIQsList(!showBIQsList);
-  };
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     // write form result to localStorage
@@ -131,41 +122,51 @@ const CoreForm = () => {
 
   return (
     <div>
-      <button
-        type='button'
-        className='mt-8 block h-10 rounded-md border border-slate-200 px-6 font-semibold text-slate-900'
-        onClick={handleShowPeopleList}
-      >
-        {showPeopleList
-          ? 'Скрыть список сотрудников'
-          : 'Показать список сотрудников'}
-      </button>
+      <Alert
+        message='Внимание!'
+        description={
+          <span>
+            Перед началом заполнения формы необходимо актуализировтаь{' '}
+            <strong>Список сотрудников</strong> и <strong>Список БИКов</strong>
+          </span>
+        }
+        type='warning'
+        showIcon
+        closable
+        className='mb-4'
+      />
 
-      {showPeopleList && (
-        <PeopleList
-          peopleList={peopleList}
-          setPeopleList={setPeopleList}
-          className='mt-4'
-        />
-      )}
+      <Collapse
+        items={[
+          {
+            key: '1',
+            label: 'Список сотрудников',
+            children: (
+              <PeopleList
+                peopleList={peopleList}
+                setPeopleList={setPeopleList}
+              />
+            ),
+          },
+        ]}
+      />
 
-      <button
-        type='button'
-        className='mt-8 block h-10 rounded-md border border-slate-200 px-6 font-semibold text-slate-900'
-        onClick={handleShowBIQsList}
-      >
-        {showBIQsList ? 'Скрыть список БИКов' : 'Показать список БИКов'}
-      </button>
-
-      {showBIQsList && (
-        <BIQsList
-          biqsList={biqsList}
-          setBiqsList={setBiqsList}
-          className='mt-4'
-        />
-      )}
+      <Collapse
+        className='mt-4'
+        items={[
+          {
+            key: '1',
+            label: 'Список БИКов',
+            children: (
+              <BIQsList biqsList={biqsList} setBiqsList={setBiqsList} />
+            ),
+          },
+        ]}
+      />
 
       <form onSubmit={handleSubmit(onSubmit)} className='mt-4'>
+        <h2 className='py-4 text-xl font-bold'>Форма планирования списаний</h2>
+
         <div className='w-[400px]'>
           <Controller
             control={control}
