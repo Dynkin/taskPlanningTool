@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
 import { useForm, SubmitHandler, useFieldArray } from 'react-hook-form';
+import { InputField } from '@/common/components/InputField/InputField';
 
 export type BIQsListItem = {
   BIQTaskId: string;
@@ -22,7 +23,6 @@ const BIQsListComponent: React.FC<Props> = ({
   className,
 }) => {
   const {
-    register,
     control,
     handleSubmit,
     formState: { errors },
@@ -49,43 +49,32 @@ const BIQsListComponent: React.FC<Props> = ({
             {BIQsFieldArray.fields.map((BIQsListItemField, index) => (
               <div key={BIQsListItemField.id} className='flex items-end gap-4'>
                 <div className='w-full'>
-                  <label
-                    htmlFor={`BIQs.${index}.BIQTaskId`}
-                    className='text-md block font-medium text-slate-700'
-                  >
-                    Номер БИКа в Jira
-                  </label>
-                  <input
-                    type='text'
-                    id={`BIQs.${index}.BIQTaskId`}
-                    className='mt-1 block h-10 w-full appearance-none rounded-md pl-4 text-sm leading-6 text-slate-900 placeholder-slate-400 shadow-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500'
-                    {...register(`BIQs.${index}.BIQTaskId` as const, {
-                      required: true,
-                    })}
+                  <InputField
+                    label='Номер БИКа в Jira'
+                    control={control}
+                    name={`BIQs.${index}.BIQTaskId` as const}
+                    rules={{
+                      required: {
+                        value: true,
+                        message: 'Номер БИКа в Jira обязательное поле',
+                      },
+                    }}
+                    error={errors.BIQs?.[index]?.BIQTaskId}
                   />
-                  {errors.BIQs?.[index]?.BIQTaskId && (
-                    <p className='text-red-500'>Обязательное поле</p>
-                  )}
                 </div>
-
                 <div className='w-full'>
-                  <label
-                    htmlFor={`BIQs.${index}.BIQTaskSummary`}
-                    className='text-md block font-medium text-slate-700'
-                  >
-                    Название БИКа
-                  </label>
-                  <input
-                    type='text'
-                    id={`BIQs.${index}.BIQTaskSummary`}
-                    className='mt-1 block h-10 w-full appearance-none rounded-md pl-4 text-sm leading-6 text-slate-900 placeholder-slate-400 shadow-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500'
-                    {...register(`BIQs.${index}.BIQTaskSummary` as const, {
-                      required: true,
-                    })}
+                  <InputField
+                    label='Название БИКа'
+                    control={control}
+                    name={`BIQs.${index}.BIQTaskSummary` as const}
+                    rules={{
+                      required: {
+                        value: true,
+                        message: 'Название БИКа обязательное поле',
+                      },
+                    }}
+                    error={errors.BIQs?.[index]?.BIQTaskSummary}
                   />
-                  {errors.BIQs?.[index]?.BIQTaskSummary && (
-                    <p className='text-red-500'>Обязательное поле</p>
-                  )}
                 </div>
               </div>
             ))}
