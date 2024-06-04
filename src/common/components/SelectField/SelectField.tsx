@@ -36,13 +36,10 @@ const SelectFieldComponent: React.FC<Props> = ({
     onChange({ target: { value } });
   };
 
-  const computedClassName = classNames(className, 'w-full');
+  const computedClassName = classNames(className, 'w-full', 'mt-1');
   return (
     <div>
-      <label
-        htmlFor={id}
-        className='text-md mt-4 block font-medium text-slate-700'
-      >
+      <label htmlFor={id} className='block text-sm font-medium text-slate-700'>
         {label}
       </label>
       <Select

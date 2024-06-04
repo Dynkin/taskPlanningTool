@@ -10,6 +10,7 @@ import { JSONPreview } from './JSONPreview/JSONPreview';
 import { PeopleList } from './PeopleList/PeopleList';
 import { BIQsList } from './BIQsList/BIQsList';
 import { SelectField } from '../../common/components/SelectField/SelectField';
+import { InputField } from '../../common/components/InputField/InputField';
 import {
   setLocalStorage,
   getLocalStorage,
@@ -164,7 +165,7 @@ const CoreForm = () => {
         />
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} className='mt-4'>
         <div className='w-[400px]'>
           <Controller
             control={control}
@@ -213,29 +214,21 @@ const CoreForm = () => {
         </div>
 
         <div className='mt-4 w-[400px]'>
-          <label
-            htmlFor='monthWorkHours'
-            className='text-md block font-medium text-slate-700'
-          >
-            Количество рабочих часов в месяце
-          </label>
-          <input
+          <InputField
             type='number'
-            defaultValue='160'
-            id='monthWorkHours'
-            className='mt-1 block w-full appearance-none rounded-md py-2 pl-4 text-sm leading-6 text-slate-900 placeholder-slate-400 shadow-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500'
-            {...register('monthWorkHours', {
-              required: true,
+            label='Количество рабочих часов в месяце'
+            control={control}
+            name='monthWorkHours'
+            rules={{
+              required: {
+                value: true,
+                message:
+                  'Нужно указать необходимое количество рабочих часов в месяце',
+              },
               valueAsNumber: true,
-            })}
+            }}
+            error={errors.monthWorkHours}
           />
-          <div className='mt-1 block text-red-500'>
-            {errors.monthWorkHours && (
-              <span>
-                Нужно указать необходимое количество рабочих часов в месяце
-              </span>
-            )}
-          </div>
         </div>
 
         <div className='mt-10'>
