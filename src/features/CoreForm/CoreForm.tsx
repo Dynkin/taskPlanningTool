@@ -6,19 +6,17 @@ import {
   Controller,
 } from 'react-hook-form';
 import { Collapse, Alert } from 'antd';
+import dayjs from 'dayjs';
 import { EmployeeInput } from './EmployeeInput/EmployeeInput';
 import { JSONPreview } from './JSONPreview/JSONPreview';
 import { PeopleList } from './PeopleList/PeopleList';
 import { BIQsList } from './BIQsList/BIQsList';
-import { SelectField } from '../../common/components/SelectField/SelectField';
-import { InputField } from '../../common/components/InputField/InputField';
-import {
-  setLocalStorage,
-  getLocalStorage,
-} from '../../utils/localStorageUtils';
-import { capitalize } from '../../utils/textUtils';
-import { getInputDate } from '../../utils/dateUtils';
-import projectNames from '../../common/contstants/projectNames';
+import { SelectField } from '@/common/components/SelectField/SelectField';
+import { InputField } from '@/common/components/InputField/InputField';
+import { DatePickerField } from '@/common/components/DatePickerField/DatePickerField';
+import { setLocalStorage, getLocalStorage } from '@/utils/localStorageUtils';
+import { capitalize } from '@/utils/textUtils';
+import projectNames from '@/common/contstants/projectNames';
 import 'highlight.js/styles/github.css';
 
 import type { Inputs } from './CoreForm.types';
@@ -30,17 +28,16 @@ const CoreForm = () => {
   const coreFormDataFromLocalStorage = getLocalStorage('coreFormData');
   let defaultCoreFormData: Inputs = {
     projectName: projectNames[0].value,
-    planningStartDate: getInputDate(new Date()),
+    planningStartDate: dayjs().format(),
     monthWorkHours: 0,
     employees: [],
   };
   if (coreFormDataFromLocalStorage) {
     defaultCoreFormData = JSON.parse(coreFormDataFromLocalStorage);
-    defaultCoreFormData.planningStartDate = getInputDate(
+    defaultCoreFormData.planningStartDate =
       defaultCoreFormData.planningStartDate
-        ? new Date(defaultCoreFormData.planningStartDate)
-        : new Date()
-    );
+        ? dayjs(defaultCoreFormData.planningStartDate).format()
+        : dayjs().format();
   }
 
   // get people list from localStorage
@@ -88,6 +85,7 @@ const CoreForm = () => {
   }, [biqsList]);
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
+    console.log('DATA', data);
     // write form result to localStorage
     setLocalStorage('coreFormData', JSON.stringify(data));
 
@@ -102,14 +100,13 @@ const CoreForm = () => {
                 month: 'long',
               })
             );
-            const jiraDate = getInputDate(planningStartDt);
 
             return {
               project: data.projectName,
               assignee: employee.jiraLogin,
               summary: `${employee.fioShort} : ${BIQWithPercent.BIQ} : ${fullYear} ${localeMonth}`,
               priority: 'Lowest',
-              planningStartDt: jiraDate,
+              planningStartDt: dayjs(planningStartDt).format('YYYY-MM-DD'),
               plannedHours: BIQWithPercent.hours,
               BIQ: BIQWithPercent.BIQ,
             };
@@ -167,69 +164,88 @@ const CoreForm = () => {
       <form onSubmit={handleSubmit(onSubmit)} className='mt-4'>
         <h2 className='py-4 text-xl font-bold'>Форма планирования списаний</h2>
 
-        <div className='w-[400px]'>
-          <Controller
-            control={control}
-            name='projectName'
-            rules={{
-              required: 'Не указано название проекта',
-            }}
-            render={({ field: { onChange, onBlur, value } }) => (
-              <SelectField
-                error={errors.projectName}
-                onChange={onChange}
-                onBlur={onBlur}
-                value={value}
-                label='Названиие проекта'
-                options={projectNames}
-                id='projectName'
-                showSearch
-              />
-            )}
-          />
-        </div>
-
-        <div className='mt-4 w-[400px]'>
-          <label
-            htmlFor='planningStartDate'
-            className='text-md block font-medium text-slate-700'
-          >
-            Плановая дата начала
-          </label>
-          <input
-            type='date'
-            id='planningStartDate'
-            className='w-full rounded-md border border-gray-300 p-2'
-            {...register('planningStartDate', {
-              required: true,
-            })}
-          />
-          <div className='mt-1 block text-red-500'>
-            {errors.planningStartDate && (
-              <span>
-                {errors.planningStartDate.message ||
-                  'Пожалуйста, выберите плановую дату начала'}
-              </span>
-            )}
+        <div className='mb-4 flex gap-4'>
+          <div className='grow'>
+            <Controller
+              control={control}
+              name='projectName'
+              rules={{
+                required: 'Не указано название проекта',
+              }}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <SelectField
+                  error={errors.projectName}
+                  onChange={onChange}
+                  onBlur={onBlur}
+                  value={value}
+                  label='Названиие проекта'
+                  options={projectNames}
+                  id='projectName'
+                  showSearch
+                />
+              )}
+            />
           </div>
-        </div>
 
-        <div className='mt-4 w-[400px]'>
-          <InputField
-            type='number'
-            label='Количество рабочих часов в месяце'
-            control={control}
-            name='monthWorkHours'
-            rules={{
-              required: {
-                value: true,
-                message:
-                  'Нужно указать необходимое количество рабочих часов в месяце',
-              },
-              valueAsNumber: true,
-            }}
-            error={errors.monthWorkHours}
-          />
+          <div className='grow'>
+            <Controller
+              control={control}
+              name='planningStartDate'
+              rules={{
+                required: 'Пожалуйста, выберите плановую дату начала',
+              }}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <DatePickerField
+                  error={errors.planningStartDate}
+                  onChange={onChange}
+                  onBlur={onBlur}
+                  value={dayjs(value)}
+                  label='Плановая дата начала'
+                  id='planningStartDate'
+                />
+              )}
+            />
+            {/* <label
+              htmlFor='planningStartDate'
+              className='text-md block font-medium text-slate-700'
+            >
+              Плановая дата начала
+            </label>
+            <input
+              type='date'
+              id='planningStartDate'
+              className='w-full rounded-md border border-gray-300 p-2'
+              {...register('planningStartDate', {
+                required: true,
+              })}
+            />
+            <div className='mt-1 block text-red-500'>
+              {errors.planningStartDate && (
+                <span>
+                  {errors.planningStartDate.message ||
+                    'Пожалуйста, выберите плановую дату начала'}
+                </span>
+              )}
+            </div> */}
+          </div>
+
+          <div className='grow'>
+            <InputField
+              type='number'
+              label='Количество рабочих часов в месяце'
+              control={control}
+              name='monthWorkHours'
+              rules={{
+                required: {
+                  value: true,
+                  message:
+                    'Нужно указать необходимое количество рабочих часов в месяце',
+                },
+                valueAsNumber: true,
+              }}
+              error={errors.monthWorkHours}
+            />
+          </div>
         </div>
 
         <div className='mt-10'>
