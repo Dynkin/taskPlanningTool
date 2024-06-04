@@ -39,6 +39,7 @@ const InputFieldComponent: React.FC<Props> = ({
       <Controller
         control={control}
         name={name}
+        rules={rules}
         render={({
           field: { onChange, onBlur, value, ref },
           fieldState: { error: fieldError },
@@ -46,7 +47,14 @@ const InputFieldComponent: React.FC<Props> = ({
           <Input
             className='mt-1'
             id={name}
-            onChange={onChange}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (rules?.valueAsNumber) {
+                onChange(Number(value));
+              } else {
+                onChange(value);
+              }
+            }}
             onBlur={onBlur}
             value={value}
             ref={ref}
@@ -54,7 +62,6 @@ const InputFieldComponent: React.FC<Props> = ({
             {...rest}
           />
         )}
-        rules={rules}
       />
       {error && (
         <div className='mt-1 text-sm text-red-500'>{error.message}</div>
