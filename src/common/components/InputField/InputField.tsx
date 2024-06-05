@@ -11,7 +11,7 @@ interface Props extends InputProps {
   rules?: RegisterOptions;
   control: Control<any, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
   className?: string;
-  label?: string;
+  label?: string | React.ReactNode;
   error?: FieldError;
 }
 

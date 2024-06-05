@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { useFieldArray, useWatch, Controller } from 'react-hook-form';
 import classNames from 'classnames';
 import { Button } from 'antd';
-import { DeleteOutlined } from '@ant-design/icons';
+import { DeleteOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { SelectField } from '@/common/components/SelectField/SelectField';
 import { InputField } from '@/common/components/InputField/InputField';
 
@@ -78,6 +78,9 @@ const BIQWithPercentInputComponent: React.FC<Props> = ({
     label: `${BIQ.BIQTaskId} ${BIQ.BIQTaskSummary}`,
   }));
   biqsOptions.unshift({ value: '', label: 'Не выбрано' });
+  biqsOptions.sort((a, b) =>
+    a.value.replace('BIQ-', '') > b.value.replace('BIQ-', '') ? 1 : -1
+  );
 
   return (
     <div className='mt-4'>
@@ -187,9 +190,9 @@ const BIQWithPercentInputComponent: React.FC<Props> = ({
         })}
       </div>
 
-      <button
-        type='button'
-        className='group mt-4 flex items-center rounded-md bg-blue-500 py-2 pl-2 pr-3 text-sm font-medium text-white shadow-sm hover:bg-blue-400'
+      <Button
+        type='primary'
+        className='mt-4'
         onClick={() =>
           append({
             BIQ: '',
@@ -197,18 +200,10 @@ const BIQWithPercentInputComponent: React.FC<Props> = ({
             hours: 0,
           })
         }
+        icon={<PlusCircleOutlined />}
       >
-        <svg
-          width='20'
-          height='20'
-          fill='currentColor'
-          className='mr-2'
-          aria-hidden='true'
-        >
-          <path d='M10 5a1 1 0 0 1 1 1v3h3a1 1 0 1 1 0 2h-3v3a1 1 0 1 1-2 0v-3H6a1 1 0 1 1 0-2h3V6a1 1 0 0 1 1-1Z' />
-        </svg>
         Добавить BIQ
-      </button>
+      </Button>
 
       {totalBIQCount > 0 && (
         <div className='mt-4 flex gap-6 border-t border-gray-200 pt-4'>

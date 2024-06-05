@@ -5,7 +5,8 @@ import {
   useFieldArray,
   Controller,
 } from 'react-hook-form';
-import { Collapse, Alert } from 'antd';
+import { Collapse, Alert, Button, ConfigProvider, notification } from 'antd';
+import { SaveOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { EmployeeInput } from './EmployeeInput/EmployeeInput';
 import { JSONPreview } from './JSONPreview/JSONPreview';
@@ -69,6 +70,9 @@ const CoreForm = () => {
     defaultValues: defaultCoreFormData,
   });
 
+  const [notificationAPI, notificationContextHolder] =
+    notification.useNotification();
+
   const employeesFieldArray = useFieldArray({
     name: 'employees',
     control,
@@ -85,7 +89,6 @@ const CoreForm = () => {
   }, [biqsList]);
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    console.log('DATA', data);
     // write form result to localStorage
     setLocalStorage('coreFormData', JSON.stringify(data));
 
@@ -115,167 +118,210 @@ const CoreForm = () => {
         .flat(),
     };
     setTasksJsonConfig(JSON.stringify(tasksConfig, null, 2));
+    notificationAPI['success']({
+      message: 'Конфигурация сохранена',
+      description: (
+        <div className='flex flex-col gap-4'>
+          <div>JSON сгенерирован</div>
+          <div>Данные сохранены в LocalStorage</div>
+        </div>
+      ),
+    });
   };
 
   return (
-    <div>
-      <Alert
-        message='Внимание!'
-        description={
-          <span>
-            Перед началом заполнения формы необходимо актуализировтаь{' '}
-            <strong>Список сотрудников</strong> и <strong>Список БИКов</strong>
-          </span>
-        }
-        type='warning'
-        showIcon
-        closable
-        className='mb-4'
-      />
+    <>
+      {notificationContextHolder}
+      <div className='core-form'>
+        <Alert
+          message='Внимание!'
+          description={
+            <span>
+              Перед началом заполнения формы необходимо актуализировтаь{' '}
+              <strong>Список сотрудников</strong> и{' '}
+              <strong>Список БИКов</strong>
+            </span>
+          }
+          type='warning'
+          showIcon
+          closable
+          className='mb-4'
+        />
 
-      <Collapse
-        items={[
-          {
-            key: '1',
-            label: 'Список сотрудников',
-            children: (
-              <PeopleList
-                peopleList={peopleList}
-                setPeopleList={setPeopleList}
-              />
-            ),
-          },
-        ]}
-      />
-
-      <Collapse
-        className='mt-4'
-        items={[
-          {
-            key: '1',
-            label: 'Список БИКов',
-            children: (
-              <BIQsList biqsList={biqsList} setBiqsList={setBiqsList} />
-            ),
-          },
-        ]}
-      />
-
-      <form onSubmit={handleSubmit(onSubmit)} className='mt-4'>
-        <h2 className='py-4 text-xl font-bold'>Форма планирования списаний</h2>
-
-        <div className='mb-4 flex gap-4'>
-          <div className='grow'>
-            <Controller
-              control={control}
-              name='projectName'
-              rules={{
-                required: 'Не указано название проекта',
-              }}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <SelectField
-                  error={errors.projectName}
-                  onChange={onChange}
-                  onBlur={onBlur}
-                  value={value}
-                  label='Названиие проекта'
-                  options={projectNames}
-                  id='projectName'
-                  showSearch
+        <Collapse
+          items={[
+            {
+              key: '1',
+              label: 'Список сотрудников',
+              children: (
+                <PeopleList
+                  peopleList={peopleList}
+                  setPeopleList={setPeopleList}
                 />
-              )}
-            />
-          </div>
+              ),
+            },
+          ]}
+        />
 
-          <div className='grow'>
-            <Controller
-              control={control}
-              name='planningStartDate'
-              rules={{
-                required: 'Пожалуйста, выберите плановую дату начала',
-              }}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <DatePickerField
-                  error={errors.planningStartDate}
-                  onChange={onChange}
-                  onBlur={onBlur}
-                  value={dayjs(value)}
-                  label='Плановая дата начала'
-                  id='planningStartDate'
-                />
-              )}
-            />
-          </div>
+        <Collapse
+          className='mt-4'
+          items={[
+            {
+              key: '1',
+              label: 'Список БИКов',
+              children: (
+                <BIQsList biqsList={biqsList} setBiqsList={setBiqsList} />
+              ),
+            },
+          ]}
+        />
 
-          <div className='grow'>
-            <InputField
-              type='number'
-              label='Количество рабочих часов в месяце'
-              control={control}
-              name='monthWorkHours'
-              rules={{
-                required: {
-                  value: true,
-                  message:
-                    'Нужно указать необходимое количество рабочих часов в месяце',
-                },
-                valueAsNumber: true,
-              }}
-              error={errors.monthWorkHours}
-            />
-          </div>
-        </div>
+        <form onSubmit={handleSubmit(onSubmit)} className='mt-4'>
+          <h2 className='py-4 text-xl font-bold'>
+            Форма планирования списаний
+          </h2>
 
-        <div className='mt-10'>
-          {employeesFieldArray.fields.map(
-            (employeeField, employeeFieldIndex) => (
-              <EmployeeInput
-                key={employeeField.id}
-                employeeFieldIndex={employeeFieldIndex}
-                register={register}
-                errors={errors}
-                remove={employeesFieldArray.remove}
-                setValue={setValue}
+          <div className='mb-4 flex gap-4'>
+            <div className='grow'>
+              <Controller
                 control={control}
-                peopleList={peopleList}
-                biqsList={biqsList}
+                name='projectName'
+                rules={{
+                  required: 'Не указано название проекта',
+                }}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <SelectField
+                    error={errors.projectName}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    value={value}
+                    label='Названиие проекта'
+                    options={projectNames}
+                    id='projectName'
+                    showSearch
+                  />
+                )}
               />
-            )
-          )}
-        </div>
+            </div>
 
-        {employeesFieldArray.fields.length < peopleList.length ? (
-          <button
-            type='button'
-            className='mt-10 block h-10 rounded-md border border-slate-200 px-6 font-semibold text-slate-900 shadow-sm'
-            onClick={() =>
-              employeesFieldArray.append({
-                fio: '',
-                fioShort: '',
-                jiraLogin: '',
-                psu: 100,
-                BIQsWithPercent: [],
-              })
-            }
-          >
-            Добавить план сотрудника
-          </button>
-        ) : (
-          <div className='mt-6 text-lg font-semibold text-green-500'>
-            Вы добавили план для всех сотрудников из списка!
+            <div className='grow'>
+              <Controller
+                control={control}
+                name='planningStartDate'
+                rules={{
+                  required: 'Пожалуйста, выберите плановую дату начала',
+                }}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <DatePickerField
+                    error={errors.planningStartDate}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    value={dayjs(value)}
+                    label='Плановая дата начала'
+                    id='planningStartDate'
+                  />
+                )}
+              />
+            </div>
+
+            <div className='grow'>
+              <InputField
+                type='number'
+                label={
+                  <span>
+                    Количество{' '}
+                    <a
+                      href='https://www.consultant.ru/law/ref/calendar/proizvodstvennye/'
+                      target='_blank'
+                      rel='noreferrer'
+                      className='text-blue-500 hover:underline'
+                    >
+                      рабочих часов
+                    </a>{' '}
+                    в месяце
+                  </span>
+                }
+                control={control}
+                name='monthWorkHours'
+                rules={{
+                  required: {
+                    value: true,
+                    message:
+                      'Нужно указать необходимое количество рабочих часов в месяце',
+                  },
+                  valueAsNumber: true,
+                }}
+                error={errors.monthWorkHours}
+              />
+            </div>
           </div>
-        )}
 
-        <button
-          type='submit'
-          className='mt-8 rounded-md bg-green-500 px-4 py-2 font-semibold text-white shadow-sm hover:bg-green-400'
-        >
-          Создать конфигурацию
-        </button>
-      </form>
+          <div className='mt-10'>
+            {employeesFieldArray.fields.map(
+              (employeeField, employeeFieldIndex) => (
+                <EmployeeInput
+                  key={employeeField.id}
+                  employeeFieldIndex={employeeFieldIndex}
+                  register={register}
+                  errors={errors}
+                  remove={employeesFieldArray.remove}
+                  setValue={setValue}
+                  control={control}
+                  peopleList={peopleList}
+                  biqsList={biqsList}
+                />
+              )
+            )}
+          </div>
 
-      <JSONPreview json={tasksJsonConfig} />
-    </div>
+          {employeesFieldArray.fields.length < peopleList.length ? (
+            <Button
+              type='primary'
+              className='mt-10 block'
+              icon={<PlusCircleOutlined />}
+              onClick={() =>
+                employeesFieldArray.append({
+                  fio: '',
+                  fioShort: '',
+                  jiraLogin: '',
+                  psu: 100,
+                  BIQsWithPercent: [],
+                })
+              }
+            >
+              Добавить план сотрудника
+            </Button>
+          ) : (
+            <div className='mt-6 text-lg font-semibold text-green-500'>
+              Вы добавили план для всех сотрудников из списка!
+            </div>
+          )}
+
+          <ConfigProvider
+            theme={{
+              components: {
+                Button: {
+                  colorPrimary: '#389e0d',
+                  colorPrimaryHover: '#52c41a',
+                  colorPrimaryActive: '#237804',
+                },
+              },
+            }}
+          >
+            <Button
+              htmlType='submit'
+              type='primary'
+              icon={<SaveOutlined />}
+              className='mt-8 block'
+            >
+              Сохранить конфигурацию
+            </Button>
+          </ConfigProvider>
+        </form>
+
+        <JSONPreview json={tasksJsonConfig} />
+      </div>
+    </>
   );
 };
 

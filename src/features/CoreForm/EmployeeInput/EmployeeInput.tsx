@@ -1,8 +1,10 @@
 import React, { memo, useState, useEffect } from 'react';
 import { useWatch } from 'react-hook-form';
 import { BIQWithPercentInput } from './BIQWithPercentInput/BIQWithPercentInput';
-import { Select } from 'antd';
+import { Select, Button } from 'antd';
+import { DeleteOutlined } from '@ant-design/icons';
 import { defaultSelectFilterOption } from '@/utils/inputUtils';
+import { InputField } from '@/common/components/InputField/InputField';
 
 import type { Inputs } from '../CoreForm.types';
 import type { PeopleListItem } from '../PeopleList/PeopleList';
@@ -61,6 +63,13 @@ const EmployeeInputComponent: React.FC<Props> = ({
       watchedEmployees.findIndex((employee) => employee.fio === person.label)
     );
   peopleOptions.unshift({ value: '', label: 'Не выбрано' });
+  const collator = new Intl.Collator('en', {
+    numeric: true,
+    sensitivity: 'base',
+  });
+  peopleOptions.sort((a, b) => {
+    return collator.compare(a.label, b.label);
+  });
 
   const selectOnChangeHandler = (value: string) => {
     const foundEmployee = peopleList.find((person) => person.fio === value);
@@ -81,116 +90,87 @@ const EmployeeInputComponent: React.FC<Props> = ({
     <div className='mt-4 rounded-md border border-gray-200 p-4'>
       <section>
         {!employeeIsVisible ? (
-          <Select
-            className='w-80'
-            id={`employees.${employeeFieldIndex}.fio`}
-            onChange={selectOnChangeHandler}
-            options={peopleOptions}
-            filterOption={defaultSelectFilterOption}
-            showSearch
-          />
-        ) : (
           <div className='flex items-end gap-4'>
-            <div className='w-full'>
-              <label
-                htmlFor={`employees.${employeeFieldIndex}.fio`}
-                className='text-md block font-medium text-slate-700'
-              >
-                ФИО (полностью)
-              </label>
-              <input
-                disabled
-                type='text'
-                id={`employees.${employeeFieldIndex}.fio`}
-                className='mt-1 block h-10 w-full appearance-none rounded-md pl-4 text-sm leading-6 text-slate-900 placeholder-slate-400 shadow-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500'
-                {...register(`employees.${employeeFieldIndex}.fio` as const, {
-                  required: true,
-                })}
-              />
-            </div>
-
-            <div className='w-full'>
-              <label
-                htmlFor={`employees.${employeeFieldIndex}.fioShort`}
-                className='text-md block font-medium text-slate-700'
-              >
-                ФИО (сокращенное)
-              </label>
-              <input
-                disabled
-                type='text'
-                id={`employees.${employeeFieldIndex}.fioShort`}
-                className='mt-1 block h-10 w-full appearance-none rounded-md pl-4 text-sm leading-6 text-slate-900 placeholder-slate-400 shadow-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500'
-                {...register(
-                  `employees.${employeeFieldIndex}.fioShort` as const,
-                  {
-                    required: true,
-                  }
-                )}
-              />
-            </div>
-
-            <div className='w-full'>
-              <label
-                htmlFor={`employees.${employeeFieldIndex}.jiraLogin`}
-                className='text-md block font-medium text-slate-700'
-              >
-                Логин Jira
-              </label>
-              <input
-                disabled
-                type='text'
-                id={`employees.${employeeFieldIndex}.jiraLogin`}
-                className='mt-1 block h-10 w-full appearance-none rounded-md pl-4 text-sm leading-6 text-slate-900 placeholder-slate-400 shadow-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500'
-                {...register(
-                  `employees.${employeeFieldIndex}.jiraLogin` as const,
-                  {
-                    required: true,
-                  }
-                )}
-              />
-            </div>
-
-            <div className='w-full'>
-              <label
-                htmlFor={`employees.${employeeFieldIndex}.psu`}
-                className='text-md block font-medium text-slate-700'
-              >
-                Процент ПШЕ
-              </label>
-              <input
-                disabled
-                type='number'
-                step='0.01'
-                id={`employees.${employeeFieldIndex}.psu`}
-                className='mt-1 block h-10 w-full appearance-none rounded-md pl-4 text-sm leading-6 text-slate-900 placeholder-slate-400 shadow-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500'
-                placeholder='% ПШЕ'
-                {...register(`employees.${employeeFieldIndex}.psu` as const, {
-                  required: true,
-                  valueAsNumber: true,
-                })}
-              />
-            </div>
-
-            <button
-              type='button'
-              className='h-10 rounded-md border border-red-500 px-4 text-sm leading-6 text-red-500 shadow-sm'
+            <Select
+              placeholder='Выберите сотрудника'
+              className='w-80'
+              id={`employees.${employeeFieldIndex}.fio`}
+              onChange={selectOnChangeHandler}
+              options={peopleOptions}
+              filterOption={defaultSelectFilterOption}
+              showSearch
+            />
+            <Button
+              className='shrink-0 grow-0'
+              type='primary'
+              icon={<DeleteOutlined />}
               onClick={() => remove(employeeFieldIndex)}
+              danger
             >
               Удалить
-            </button>
+            </Button>
+          </div>
+        ) : (
+          <div>
+            <div className='flex items-end gap-4'>
+              <div className='shrink-0 grow-[2]'>
+                <InputField
+                  label='ФИО (полностью)'
+                  control={control}
+                  name={`employees.${employeeFieldIndex}.fio` as const}
+                  disabled
+                />
+              </div>
+
+              <div className='shrink-0 grow'>
+                <InputField
+                  label='ФИО (сокращенное)'
+                  control={control}
+                  name={`employees.${employeeFieldIndex}.fioShort` as const}
+                  disabled
+                />
+              </div>
+
+              <div className='shrink-0 grow'>
+                <InputField
+                  label='Логин Jira'
+                  control={control}
+                  name={`employees.${employeeFieldIndex}.jiraLogin` as const}
+                  disabled
+                />
+              </div>
+
+              <div className='shrink-0 grow'>
+                <InputField
+                  label='Процент ПШЕ'
+                  control={control}
+                  name={`employees.${employeeFieldIndex}.psu` as const}
+                  disabled
+                />
+              </div>
+
+              <Button
+                type='primary'
+                className='shrink-0 grow-0'
+                icon={<DeleteOutlined />}
+                onClick={() => remove(employeeFieldIndex)}
+                danger
+              >
+                Удалить
+              </Button>
+            </div>
+
+            <BIQWithPercentInput
+              biqsList={biqsList}
+              nestIndex={employeeFieldIndex}
+              control={control}
+              register={register}
+              setValue={setValue}
+              errors={errors}
+            />
           </div>
         )}
       </section>
-
-      <BIQWithPercentInput
-        biqsList={biqsList}
-        nestIndex={employeeFieldIndex}
-        control={control}
-        register={register}
-        setValue={setValue}
-        errors={errors}
-      />
     </div>
   );
 };
