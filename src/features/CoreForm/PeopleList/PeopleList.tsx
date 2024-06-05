@@ -46,7 +46,7 @@ const PeopleListComponent: React.FC<Props> = ({
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     setPeopleList(data.people);
-    notificationAPI['success']({
+    notificationAPI.success({
       message: 'Сотрудники сохранены',
       description: 'Список сорудников успешно сохранен в LocalStorage',
     });

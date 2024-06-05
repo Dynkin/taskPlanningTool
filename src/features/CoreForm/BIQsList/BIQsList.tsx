@@ -44,7 +44,7 @@ const BIQsListComponent: React.FC<Props> = ({
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     setBiqsList(data.BIQs);
-    notificationAPI['success']({
+    notificationAPI.success({
       message: 'БИКи сохранены',
       description: 'Список БИКов успешно сохранен в LocalStorage',
     });

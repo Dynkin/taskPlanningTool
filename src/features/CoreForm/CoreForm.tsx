@@ -118,7 +118,7 @@ const CoreForm = () => {
         .flat(),
     };
     setTasksJsonConfig(JSON.stringify(tasksConfig, null, 2));
-    notificationAPI['success']({
+    notificationAPI.success({
       message: 'Конфигурация сохранена',
       description: (
         <div className='flex flex-col gap-4'>
