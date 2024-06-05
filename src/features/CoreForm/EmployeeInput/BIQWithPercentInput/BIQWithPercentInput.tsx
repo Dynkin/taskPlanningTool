@@ -1,7 +1,10 @@
 import React, { memo } from 'react';
-import { useFieldArray, useWatch } from 'react-hook-form';
+import { useFieldArray, useWatch, Controller } from 'react-hook-form';
 import classNames from 'classnames';
-import { SelectField } from '../../../../common/components/SelectField/SelectField';
+import { Button } from 'antd';
+import { DeleteOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { SelectField } from '@/common/components/SelectField/SelectField';
+import { InputField } from '@/common/components/InputField/InputField';
 
 import type {
   UseFormRegister,
@@ -25,8 +28,8 @@ const BIQWithPercentInputComponent: React.FC<Props> = ({
   biqsList,
   nestIndex,
   control,
-  register,
   setValue,
+  errors,
 }) => {
   const { fields, remove, append } = useFieldArray({
     control,
@@ -75,6 +78,9 @@ const BIQWithPercentInputComponent: React.FC<Props> = ({
     label: `${BIQ.BIQTaskId} ${BIQ.BIQTaskSummary}`,
   }));
   biqsOptions.unshift({ value: '', label: 'Не выбрано' });
+  biqsOptions.sort((a, b) =>
+    a.value.replace('BIQ-', '') > b.value.replace('BIQ-', '') ? 1 : -1
+  );
 
   return (
     <div className='mt-4'>
@@ -85,99 +91,108 @@ const BIQWithPercentInputComponent: React.FC<Props> = ({
               key={item.id}
               className='rounded-md border border-gray-200 p-4 shadow-sm'
             >
-              <SelectField
-                label='BIQ'
-                options={biqsOptions}
-                id={`employees.${nestIndex}.BIQsWithPercent.${index}.BIQ`}
-                {...register(
-                  `employees.${nestIndex}.BIQsWithPercent.${index}.BIQ`,
-                  {
-                    required: true,
-                  }
+              <Controller
+                control={control}
+                name={`employees.${nestIndex}.BIQsWithPercent.${index}.BIQ`}
+                rules={{
+                  required: 'Не указан BIQ',
+                }}
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <SelectField
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    value={value}
+                    label='BIQ'
+                    options={biqsOptions}
+                    id={`employees.${nestIndex}.BIQsWithPercent.${index}.BIQ`}
+                    showSearch
+                  />
                 )}
               />
-
               <div className='mt-4'>
-                <label
-                  htmlFor={`employees.${nestIndex}.BIQsWithPercent.${index}.percent`}
-                  className='text-md block font-medium text-slate-700'
-                >
-                  Процент занятости
-                </label>
-                <input
+                <InputField
                   type='number'
                   step='0.01'
-                  id={`employees.${nestIndex}.BIQsWithPercent.${index}.percent`}
-                  className='mt-1 block h-10 w-full appearance-none rounded-md pl-4 text-sm leading-6 text-slate-900 placeholder-slate-400 shadow-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500'
-                  {...register(
-                    `employees.${nestIndex}.BIQsWithPercent.${index}.percent`,
-                    {
-                      required: true,
-                      valueAsNumber: true,
-                      onBlur: (e) => {
-                        const value = e.target.value;
-                        const calculatedHours =
-                          ((watchedMonthWorkHours / 100) *
-                            watchedEmployeePsu *
-                            value) /
-                          100;
-                        setValue(
-                          `employees.${nestIndex}.BIQsWithPercent.${index}.hours`,
-                          parseFloat(calculatedHours.toFixed(2))
-                        );
-                      },
-                    }
-                  )}
+                  label='Процент занятости'
+                  control={control}
+                  name={
+                    `employees.${nestIndex}.BIQsWithPercent.${index}.percent` as const
+                  }
+                  rules={{
+                    required: {
+                      value: true,
+                      message: 'Процент занятости обязательное поле',
+                    },
+                    valueAsNumber: true,
+                  }}
+                  onBlur={(e) => {
+                    const value = Number(e.target.value);
+                    const calculatedHours =
+                      ((watchedMonthWorkHours / 100) *
+                        watchedEmployeePsu *
+                        value) /
+                      100;
+                    setValue(
+                      `employees.${nestIndex}.BIQsWithPercent.${index}.hours`,
+                      parseFloat(calculatedHours.toFixed(2))
+                    );
+                  }}
+                  error={
+                    errors.employees?.[nestIndex]?.BIQsWithPercent?.[index]
+                      ?.percent
+                  }
                 />
               </div>
 
               <div className='mt-4'>
-                <label
-                  htmlFor={`employees.${nestIndex}.BIQsWithPercent.${index}.hours`}
-                  className='text-md block font-medium text-slate-700'
-                >
-                  Количество часов
-                </label>
-                <input
+                <InputField
                   type='number'
-                  step='0.01'
-                  id={`employees.${nestIndex}.BIQsWithPercent.${index}.hours`}
-                  className='mt-1 block h-10 w-full appearance-none rounded-md pl-4 text-sm leading-6 text-slate-900 placeholder-slate-400 shadow-sm ring-1 ring-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500'
-                  {...register(
-                    `employees.${nestIndex}.BIQsWithPercent.${index}.hours`,
-                    {
-                      required: true,
-                      valueAsNumber: true,
-                      onBlur: (e) => {
-                        const value = e.target.value;
-                        const calculatedPercent =
-                          (value * 100) /
-                          ((watchedMonthWorkHours / 100) * watchedEmployeePsu);
-                        setValue(
-                          `employees.${nestIndex}.BIQsWithPercent.${index}.percent`,
-                          parseFloat(calculatedPercent.toFixed(2))
-                        );
-                      },
-                    }
-                  )}
+                  label='Количество часов'
+                  control={control}
+                  name={
+                    `employees.${nestIndex}.BIQsWithPercent.${index}.hours` as const
+                  }
+                  rules={{
+                    required: {
+                      value: true,
+                      message: 'Количество часов обязательное поле',
+                    },
+                    valueAsNumber: true,
+                  }}
+                  onBlur={(e) => {
+                    const value = Number(e.target.value);
+                    const calculatedPercent =
+                      (value * 100) /
+                      ((watchedMonthWorkHours / 100) * watchedEmployeePsu);
+                    setValue(
+                      `employees.${nestIndex}.BIQsWithPercent.${index}.percent`,
+                      parseFloat(calculatedPercent.toFixed(2))
+                    );
+                  }}
+                  error={
+                    errors.employees?.[nestIndex]?.BIQsWithPercent?.[index]
+                      ?.hours
+                  }
                 />
               </div>
 
-              <button
-                type='button'
-                className='mt-4 block h-10 rounded-md border border-red-500 px-4 text-sm leading-6 text-red-500 shadow-sm'
+              <Button
+                type='primary'
+                className='mt-4'
                 onClick={() => remove(index)}
+                icon={<DeleteOutlined />}
+                danger
               >
                 Удалить BIQ
-              </button>
+              </Button>
             </div>
           );
         })}
       </div>
 
-      <button
-        type='button'
-        className='group mt-4 flex items-center rounded-md bg-blue-500 py-2 pl-2 pr-3 text-sm font-medium text-white shadow-sm hover:bg-blue-400'
+      <Button
+        type='primary'
+        className='mt-4'
         onClick={() =>
           append({
             BIQ: '',
@@ -185,18 +200,10 @@ const BIQWithPercentInputComponent: React.FC<Props> = ({
             hours: 0,
           })
         }
+        icon={<PlusCircleOutlined />}
       >
-        <svg
-          width='20'
-          height='20'
-          fill='currentColor'
-          className='mr-2'
-          aria-hidden='true'
-        >
-          <path d='M10 5a1 1 0 0 1 1 1v3h3a1 1 0 1 1 0 2h-3v3a1 1 0 1 1-2 0v-3H6a1 1 0 1 1 0-2h3V6a1 1 0 0 1 1-1Z' />
-        </svg>
         Добавить BIQ
-      </button>
+      </Button>
 
       {totalBIQCount > 0 && (
         <div className='mt-4 flex gap-6 border-t border-gray-200 pt-4'>

@@ -1,5 +1,7 @@
 import React, { memo } from 'react';
 import { useForm, SubmitHandler, useFieldArray } from 'react-hook-form';
+import { Button, ConfigProvider, notification } from 'antd';
+import { PlusCircleOutlined, SaveOutlined } from '@ant-design/icons';
 import { PeopleListItem } from './PeopleListItem/PeopleListItem';
 
 export type PeopleListItem = {
@@ -25,7 +27,6 @@ const PeopleListComponent: React.FC<Props> = ({
   className,
 }) => {
   const {
-    register,
     control,
     handleSubmit,
     formState: { errors },
@@ -35,6 +36,9 @@ const PeopleListComponent: React.FC<Props> = ({
     },
   });
 
+  const [notificationAPI, notificationContextHolder] =
+    notification.useNotification();
+
   const peopleFieldArray = useFieldArray({
     name: 'people',
     control,
@@ -42,57 +46,63 @@ const PeopleListComponent: React.FC<Props> = ({
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     setPeopleList(data.people);
+    notificationAPI.success({
+      message: 'Сотрудники сохранены',
+      description: 'Список сорудников успешно сохранен в LocalStorage',
+    });
   };
 
   return (
-    <div className={className}>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div>
-          <div className='flex flex-col gap-4'>
+    <>
+      {notificationContextHolder}
+      <div className={className}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className='mb-8 flex flex-col gap-4'>
             {peopleFieldArray.fields.map((peopleListItemField, index) => (
               <PeopleListItem
                 key={peopleListItemField.id}
                 peopleListItemFieldIndex={index}
-                register={register}
+                control={control}
                 errors={errors}
                 remove={peopleFieldArray.remove}
               />
             ))}
           </div>
 
-          <button
-            type='button'
-            className='group mt-4 flex items-center rounded-md bg-blue-500 py-2 pl-2 pr-3 text-sm font-medium text-white shadow-sm hover:bg-blue-400'
-            onClick={() =>
-              peopleFieldArray.append({
-                fio: '',
-                fioShort: '',
-                jiraLogin: '',
-                psu: 100,
-              })
-            }
-          >
-            <svg
-              width='20'
-              height='20'
-              fill='currentColor'
-              className='mr-2'
-              aria-hidden='true'
+          <div className='flex gap-4'>
+            <Button
+              type='primary'
+              icon={<PlusCircleOutlined />}
+              onClick={() =>
+                peopleFieldArray.append({
+                  fio: '',
+                  fioShort: '',
+                  jiraLogin: '',
+                  psu: 100,
+                })
+              }
             >
-              <path d='M10 5a1 1 0 0 1 1 1v3h3a1 1 0 1 1 0 2h-3v3a1 1 0 1 1-2 0v-3H6a1 1 0 1 1 0-2h3V6a1 1 0 0 1 1-1Z' />
-            </svg>
-            Добавить нового сотрудника
-          </button>
-        </div>
-
-        <button
-          type='submit'
-          className='mt-8 rounded-md bg-green-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-green-400'
-        >
-          Сохранить список сотрудников
-        </button>
-      </form>
-    </div>
+              Добавить нового сотрудника
+            </Button>
+            <ConfigProvider
+              theme={{
+                components: {
+                  Button: {
+                    colorPrimary: '#389e0d',
+                    colorPrimaryHover: '#52c41a',
+                    colorPrimaryActive: '#237804',
+                  },
+                },
+              }}
+            >
+              <Button htmlType='submit' type='primary' icon={<SaveOutlined />}>
+                Сохранить список сотрудников
+              </Button>
+            </ConfigProvider>
+          </div>
+        </form>
+      </div>
+    </>
   );
 };
 
