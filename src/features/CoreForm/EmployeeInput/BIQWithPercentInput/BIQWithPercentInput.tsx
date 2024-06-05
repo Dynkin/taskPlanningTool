@@ -51,16 +51,28 @@ const BIQWithPercentInputComponent: React.FC<Props> = ({
     name: 'monthWorkHours',
   });
 
-  const totalBIQPercents = watchedBIQs.reduce(
-    (acc, BIQ) => acc + BIQ.percent,
-    0
-  );
+  const watchedVacationsDays = useWatch({
+    control,
+    name: `employees.${nestIndex}.vacationsDays`,
+  });
+
+  let totalBIQPercents = watchedBIQs.reduce((acc, BIQ) => acc + BIQ.percent, 0);
   const totalBIQHours = watchedBIQs.reduce((acc, BIQ) => acc + BIQ.hours, 0);
   const totalBIQCount = watchedBIQs.length;
 
-  const isSuccessTotalBIQHours =
-    totalBIQHours === (watchedMonthWorkHours * watchedEmployeePsu) / 100;
-  const isSuccessTotalBIQPercents = totalBIQPercents >= 100;
+  const psuWorkingHours = (watchedMonthWorkHours * watchedEmployeePsu) / 100;
+  const psuVacationsHours =
+    ((8 * watchedEmployeePsu) / 100) * watchedVacationsDays;
+  const totalPsuHours = psuWorkingHours - psuVacationsHours;
+  const isSuccessTotalBIQHours = totalBIQHours === totalPsuHours;
+  const isSuccessTotalBIQPercents = isSuccessTotalBIQHours
+    ? true
+    : totalBIQPercents >= 100;
+  if (isSuccessTotalBIQHours) {
+    totalBIQPercents = Math.round(totalBIQPercents);
+  } else {
+    totalBIQPercents = Number(totalBIQPercents.toFixed(2));
+  }
 
   const totalBIQHoursClassName = classNames(
     {
@@ -141,11 +153,7 @@ const BIQWithPercentInputComponent: React.FC<Props> = ({
                   }}
                   onBlur={(e) => {
                     const value = Number(e.target.value);
-                    const calculatedHours =
-                      ((watchedMonthWorkHours / 100) *
-                        watchedEmployeePsu *
-                        value) /
-                      100;
+                    const calculatedHours = (totalPsuHours * value) / 100;
                     setValue(
                       `employees.${nestIndex}.BIQsWithPercent.${index}.hours`,
                       parseFloat(calculatedHours.toFixed(2))
@@ -175,9 +183,7 @@ const BIQWithPercentInputComponent: React.FC<Props> = ({
                   }}
                   onBlur={(e) => {
                     const value = Number(e.target.value);
-                    const calculatedPercent =
-                      (value * 100) /
-                      ((watchedMonthWorkHours / 100) * watchedEmployeePsu);
+                    const calculatedPercent = (value * 100) / totalPsuHours;
                     setValue(
                       `employees.${nestIndex}.BIQsWithPercent.${index}.percent`,
                       parseFloat(calculatedPercent.toFixed(2))
@@ -223,12 +229,25 @@ const BIQWithPercentInputComponent: React.FC<Props> = ({
         <div className='mt-4 flex gap-6 border-t border-gray-200 pt-4'>
           <div className={totalBIQHoursClassName}>
             <div className='text-lg'>Общее количество часов</div>
-            <div className='pt-2 text-2xl font-extrabold'>{totalBIQHours}</div>
+            {/* <div className='pt-2 text-2xl font-extrabold'>{`${totalBIQHours} - ${psuVacationsHours} = ${totalBIQHours - psuVacationsHours}`}</div> */}
+            <div className='pt-2 text-2xl font-extrabold'>
+              <span>{totalBIQHours}</span>{' '}
+              {totalBIQHours < psuWorkingHours - psuVacationsHours && (
+                <span>&lt;</span>
+              )}
+              {totalBIQHours === psuWorkingHours - psuVacationsHours && (
+                <span>&#61;</span>
+              )}
+              {totalBIQHours > psuWorkingHours - psuVacationsHours && (
+                <span>&gt;</span>
+              )}{' '}
+              <span>{`${psuWorkingHours - psuVacationsHours} (${psuWorkingHours} - ${psuVacationsHours})`}</span>
+            </div>
           </div>
           <div className={totalBIQPercentsClassName}>
             <div className='text-lg'>Общий процент занятости</div>
             <div className='py-2 text-2xl font-extrabold'>
-              {totalBIQPercents.toFixed(2)}%
+              {totalBIQPercents}%
             </div>
           </div>
           <div className='rouded-md rounded-md bg-gray-200 px-6 py-4'>
@@ -239,6 +258,12 @@ const BIQWithPercentInputComponent: React.FC<Props> = ({
             <div className='text-lg'>Загрузка ПШЕ</div>
             <div className='py-2 text-2xl font-extrabold'>
               {watchedEmployeePsu}%
+            </div>
+          </div>
+          <div className='rouded-md rounded-md bg-gray-200 px-6 py-4'>
+            <div className='text-lg'>Отпуск в этом месяце</div>
+            <div className='py-2 text-2xl font-extrabold'>
+              {watchedVacationsDays} дн.
             </div>
           </div>
         </div>
