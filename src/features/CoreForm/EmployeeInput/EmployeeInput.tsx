@@ -59,10 +59,12 @@ const EmployeeInputComponent: React.FC<Props> = ({
     .map((person) => {
       return { value: person.fio, label: person.fio };
     })
-    .filter((person) =>
-      watchedEmployees.findIndex((employee) => employee.fio === person.label)
+    .filter(
+      (person) =>
+        watchedEmployees.findIndex(
+          (employee) => employee.fio === person.label
+        ) === -1
     );
-  peopleOptions.unshift({ value: '', label: 'Не выбрано' });
   const collator = new Intl.Collator('en', {
     numeric: true,
     sensitivity: 'base',

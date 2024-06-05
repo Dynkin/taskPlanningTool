@@ -3,6 +3,7 @@ import {
   useForm,
   SubmitHandler,
   useFieldArray,
+  useWatch,
   Controller,
 } from 'react-hook-form';
 import { Collapse, Alert, Button, ConfigProvider, notification } from 'antd';
@@ -59,6 +60,7 @@ const CoreForm = () => {
   const [peopleList, setPeopleList] =
     useState<PeopleListItem[]>(defaultPeopleList);
   const [biqsList, setBiqsList] = useState<BIQsListItem[]>(defaultBIQsList);
+  const [allPeopleAdded, setAllPeopleAdded] = useState<boolean>(false);
 
   const {
     register,
@@ -78,6 +80,12 @@ const CoreForm = () => {
     control,
   });
 
+  const watchedEmployees = useWatch({
+    control,
+    name: 'employees',
+    defaultValue: [],
+  });
+
   // sync peopleList with localStorage
   useEffect(() => {
     setLocalStorage('peopleList', JSON.stringify(peopleList));
@@ -87,6 +95,22 @@ const CoreForm = () => {
   useEffect(() => {
     setLocalStorage('BIQsList', JSON.stringify(biqsList));
   }, [biqsList]);
+
+  useEffect(() => {
+    if (watchedEmployees.length === peopleList.length) {
+      const foundEmptyEmployee = watchedEmployees.find(
+        (employee) => employee.fio === ''
+      );
+
+      if (!foundEmptyEmployee) {
+        setAllPeopleAdded(true);
+      } else {
+        setAllPeopleAdded(false);
+      }
+    } else {
+      setAllPeopleAdded(false);
+    }
+  }, [watchedEmployees, peopleList]);
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     // write form result to localStorage
@@ -274,7 +298,7 @@ const CoreForm = () => {
             )}
           </div>
 
-          {employeesFieldArray.fields.length < peopleList.length ? (
+          {employeesFieldArray.fields.length < peopleList.length && (
             <Button
               type='primary'
               className='mt-10 block'
@@ -291,11 +315,14 @@ const CoreForm = () => {
             >
               Добавить план сотрудника
             </Button>
-          ) : (
-            <div className='mt-6 text-lg font-semibold text-green-500'>
-              Вы добавили план для всех сотрудников из списка!
-            </div>
           )}
+
+          {employeesFieldArray.fields.length === peopleList.length &&
+            allPeopleAdded && (
+              <div className='mt-6 text-lg font-semibold text-green-500'>
+                Вы добавили план для всех сотрудников из списка!
+              </div>
+            )}
 
           <ConfigProvider
             theme={{
