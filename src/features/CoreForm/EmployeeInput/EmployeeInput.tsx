@@ -151,6 +151,16 @@ const EmployeeInputComponent: React.FC<Props> = ({
                 />
               </div>
 
+              <div className='shrink-0 grow'>
+                <InputField
+                  label='Дней отпуска в месяце'
+                  control={control}
+                  name={
+                    `employees.${employeeFieldIndex}.vacationsDays` as const
+                  }
+                />
+              </div>
+
               <Button
                 type='primary'
                 className='shrink-0 grow-0'

@@ -309,6 +309,7 @@ const CoreForm = () => {
                   fioShort: '',
                   jiraLogin: '',
                   psu: 100,
+                  vacationsDays: 0,
                   BIQsWithPercent: [],
                 })
               }

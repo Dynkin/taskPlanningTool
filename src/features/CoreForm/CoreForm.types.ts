@@ -9,6 +9,7 @@ export type Employee = {
   fioShort: string;
   jiraLogin: string;
   psu: number;
+  vacationsDays: number;
   BIQsWithPercent: BIQWithPercent[];
 };
 
