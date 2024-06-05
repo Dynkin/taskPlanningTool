@@ -1,5 +1,5 @@
 export type BIQWithPercent = {
-  BIQ: string;
+  BIQ: string | undefined;
   percent: number;
   hours: number;
 };
