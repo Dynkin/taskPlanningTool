@@ -6,6 +6,7 @@ import { defaultSelectFilterOption } from '@/utils/inputUtils';
 import type { FieldError } from 'react-hook-form';
 
 type Props = {
+  placeholder?: string;
   options: { value: string; label: string }[];
   label: string;
   id?: string;
@@ -22,6 +23,7 @@ type Props = {
 };
 
 const SelectFieldComponent: React.FC<Props> = ({
+  placeholder,
   options,
   id,
   className,
@@ -44,6 +46,7 @@ const SelectFieldComponent: React.FC<Props> = ({
       </label>
       <Select
         {...props}
+        placeholder={placeholder}
         className={computedClassName}
         id={id}
         options={options}

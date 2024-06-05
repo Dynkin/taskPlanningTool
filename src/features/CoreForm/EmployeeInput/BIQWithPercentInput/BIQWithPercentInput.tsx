@@ -58,14 +58,25 @@ const BIQWithPercentInputComponent: React.FC<Props> = ({
   const totalBIQHours = watchedBIQs.reduce((acc, BIQ) => acc + BIQ.hours, 0);
   const totalBIQCount = watchedBIQs.length;
 
-  const isSuccess =
-    totalBIQPercents === 100 &&
+  const isSuccessTotalBIQHours =
     totalBIQHours === (watchedMonthWorkHours * watchedEmployeePsu) / 100;
+  const isSuccessTotalBIQPercents = totalBIQPercents >= 100;
 
-  const totalItemClassName = classNames(
+  const totalBIQHoursClassName = classNames(
     {
-      'bg-red-500': !isSuccess,
-      'bg-green-500': isSuccess,
+      'bg-red-500': !isSuccessTotalBIQHours,
+      'bg-green-500': isSuccessTotalBIQHours,
+    },
+    'px-6',
+    'py-4',
+    'rounded-md',
+    'text-white'
+  );
+
+  const totalBIQPercentsClassName = classNames(
+    {
+      'bg-red-500': !isSuccessTotalBIQPercents,
+      'bg-green-500': isSuccessTotalBIQPercents,
     },
     'px-6',
     'py-4',
@@ -77,9 +88,11 @@ const BIQWithPercentInputComponent: React.FC<Props> = ({
     value: BIQ.BIQTaskId,
     label: `${BIQ.BIQTaskId} ${BIQ.BIQTaskSummary}`,
   }));
-  biqsOptions.unshift({ value: '', label: 'Не выбрано' });
   biqsOptions.sort((a, b) =>
-    a.value.replace('BIQ-', '') > b.value.replace('BIQ-', '') ? 1 : -1
+    parseInt(a.value.replace('BIQ-', ''), 10) >
+    parseInt(b.value.replace('BIQ-', ''), 10)
+      ? 1
+      : -1
   );
 
   return (
@@ -99,6 +112,7 @@ const BIQWithPercentInputComponent: React.FC<Props> = ({
                 }}
                 render={({ field: { onChange, onBlur, value } }) => (
                   <SelectField
+                    placeholder='Выберите BIQ'
                     onChange={onChange}
                     onBlur={onBlur}
                     value={value}
@@ -195,7 +209,7 @@ const BIQWithPercentInputComponent: React.FC<Props> = ({
         className='mt-4'
         onClick={() =>
           append({
-            BIQ: '',
+            BIQ: undefined,
             percent: 0,
             hours: 0,
           })
@@ -207,14 +221,14 @@ const BIQWithPercentInputComponent: React.FC<Props> = ({
 
       {totalBIQCount > 0 && (
         <div className='mt-4 flex gap-6 border-t border-gray-200 pt-4'>
-          <div className={totalItemClassName}>
+          <div className={totalBIQHoursClassName}>
             <div className='text-lg'>Общее количество часов</div>
             <div className='pt-2 text-2xl font-extrabold'>{totalBIQHours}</div>
           </div>
-          <div className={totalItemClassName}>
+          <div className={totalBIQPercentsClassName}>
             <div className='text-lg'>Общий процент занятости</div>
             <div className='py-2 text-2xl font-extrabold'>
-              {totalBIQPercents}%
+              {totalBIQPercents.toFixed(2)}%
             </div>
           </div>
           <div className='rouded-md rounded-md bg-gray-200 px-6 py-4'>
